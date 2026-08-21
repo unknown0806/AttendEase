@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Login — AttendEase{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center py-4">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="card custom-card p-4 shadow-sm border-0">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
+                    <i class="bi bi-shield-lock fs-2"></i>
+                </div>
+                <h3 class="fw-bold mb-1">Welcome to AttendEase</h3>
+                <p class="text-muted small">Sign in to your role-based attendance portal</p>
+            </div>
+
+            <form action="{{ url_for('auth.login') }}" method="POST">
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="name@college.edu" autofocus>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label fw-semibold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary py-2 fw-semibold">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                    </button>
+                </div>
+            </form>
+
+            <hr class="my-4 text-muted">
+
+            <!-- Demo Quick-Fill Buttons -->
+            <div>
+                <p class="text-muted small fw-semibold text-center mb-2">⚡ Quick-Fill Demo Credentials</p>
+                <div class="d-flex flex-wrap gap-2 justify-content-center">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickLogin('priya@college.edu', 'admin123')">
+                        <i class="bi bi-shield-check"></i> Admin (Priya)
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="quickLogin('suresh@college.edu', 'teacher123')">
+                        <i class="bi bi-person-workspace"></i> Teacher (Suresh)
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="quickLogin('rahul@student.edu', 'student123')">
+                        <i class="bi bi-mortarboard"></i> Student (Rahul)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

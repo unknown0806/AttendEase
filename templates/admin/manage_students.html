@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Students — Admin — AttendEase{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header & Add Button -->
+    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h3 class="fw-bold mb-1"><i class="bi bi-people text-primary me-2"></i>Student Management</h3>
+            <p class="text-muted mb-0 small">Add, edit, assign classes, and soft-delete/deactivate student accounts</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+            <i class="bi bi-person-plus me-1"></i> Add New Student
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="col-12">
+        <div class="card custom-card p-3">
+            <form method="GET" action="{{ url_for('admin.manage_students') }}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-4">
+                    <select name="class_id" class="form-select form-select-sm">
+                        <option value="">-- All Classes --</option>
+                        {% for c in classes %}
+                            <option value="{{ c.class_id }}" {% if selected_class_id == c.class_id %}selected{% endif %}>
+                                {{ c.class_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-3">
+                    <select name="active" class="form-select form-select-sm">
+                        <option value="">-- All Statuses --</option>
+                        <option value="true" {% if selected_active == 'true' %}selected{% endif %}>Active Only</option>
+                        <option value="false" {% if selected_active == 'false' %}selected{% endif %}>Deactivated Only</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-secondary btn-sm w-100">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                </div>
+                <div class="col-12 col-md-2">
+                    <a href="{{ url_for('admin.manage_students') }}" class="btn btn-outline-secondary btn-sm w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Students Table -->
+    <div class="col-12">
+        <div class="card custom-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Students Directory</h5>
+                <span class="badge bg-light text-dark border">{{ students|length }} Students</span>
+            </div>
+
+            {% if students %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Roll No</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Assigned Class</th>
+                                <th>Account Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stu in students %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2 py-1">
+                                            {{ stu.roll_no }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ stu.user.name }}</td>
+                                    <td class="text-muted small">{{ stu.user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ stu.class_obj.class_name }}</span>
+                                    </td>
+                                    <td>
+                                        {% if stu.user.active %}
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Deactivated</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <!-- Edit Trigger -->
+                                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" data-bs-toggle="modal" data-bs-target="#editModal{{ stu.student_id }}">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </button>
+
+                                        <!-- Toggle Soft Delete Active -->
+                                        <form method="POST" action="{{ url_for('admin.toggle_student_active', student_id=stu.student_id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to {{ 'deactivate' if stu.user.active else 'activate' }} this student?');">
+                                            {% if stu.user.active %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Soft-delete/Deactivate">
+                                                    <i class="bi bi-person-x"></i> Deactivate
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Activate account">
+                                                    <i class="bi bi-person-check"></i> Activate
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    </td>
+                                </tr>
+
+                                <!-- Edit Student Modal -->
+                                <div class="modal fade" id="editModal{{ stu.student_id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form method="POST" action="{{ url_for('admin.edit_student', student_id=stu.student_id) }}">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title fw-bold">Edit Student Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">Student Name</label>
+                                                        <input type="text" name="name" class="form-control" value="{{ stu.user.name }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">Roll Number</label>
+                                                        <input type="text" name="roll_no" class="form-control" value="{{ stu.roll_no }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-semibold">Assigned Class</label>
+                                                        <select name="class_id" class="form-select" required>
+                                                            {% for c in classes %}
+                                                                <option value="{{ c.class_id }}" {% if stu.class_id == c.class_id %}selected{% endif %}>
+                                                                    {{ c.class_name }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">
+                    No students match the current filter criteria.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Student Modal -->
+<div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('admin.manage_students') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Add New Student</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Full Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. John Doe" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Address (Login)</label>
+                        <input type="email" name="email" class="form-control" placeholder="e.g. john@student.edu" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Default: student123">
+                        <div class="form-text">Defaults to <code>student123</code> if left empty.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Roll Number</label>
+                        <input type="text" name="roll_no" class="form-control" placeholder="e.g. BCA50" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Assign to Class</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">-- Select Class --</option>
+                            {% for c in classes %}
+                                <option value="{{ c.class_id }}">{{ c.class_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

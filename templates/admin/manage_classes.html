@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Classes & Subjects — Admin — AttendEase{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header -->
+    <div class="col-12">
+        <h3 class="fw-bold mb-1"><i class="bi bi-building text-info me-2"></i>Classes & Subjects Curriculum</h3>
+        <p class="text-muted mb-0 small">Create academic sections, register subjects, and configure class-subject curriculum mappings</p>
+    </div>
+
+    <!-- Quick Forms Grid -->
+    <div class="col-12 col-lg-4">
+        <!-- Create Class Card -->
+        <div class="card custom-card p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle text-primary me-2"></i>Create New Class</h5>
+            <form method="POST" action="{{ url_for('admin.manage_classes') }}">
+                <input type="hidden" name="action" value="create_class">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Class / Section Name</label>
+                    <input type="text" name="class_name" class="form-control" placeholder="e.g. BCA 3C" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm w-100">
+                    <i class="bi bi-plus-lg me-1"></i> Add Class
+                </button>
+            </form>
+        </div>
+
+        <!-- Add Subject Card -->
+        <div class="card custom-card p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-book-half text-success me-2"></i>Add New Subject</h5>
+            <form method="POST" action="{{ url_for('admin.manage_classes') }}">
+                <input type="hidden" name="action" value="create_subject">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Subject Name</label>
+                    <input type="text" name="subject_name" class="form-control" placeholder="e.g. Cloud Computing" required>
+                </div>
+                <button type="submit" class="btn btn-success btn-sm w-100">
+                    <i class="bi bi-plus-lg me-1"></i> Add Subject
+                </button>
+            </form>
+        </div>
+
+        <!-- Map Subject to Class -->
+        <div class="card custom-card p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-link-45deg text-warning me-2"></i>Map Subject to Class</h5>
+            <form method="POST" action="{{ url_for('admin.manage_classes') }}">
+                <input type="hidden" name="action" value="assign_subject">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Select Class</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">-- Choose Class --</option>
+                        {% for c in classes %}
+                            <option value="{{ c.class_id }}">{{ c.class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">Select Subject</label>
+                    <select name="subject_id" class="form-select" required>
+                        <option value="">-- Choose Subject --</option>
+                        {% for s in subjects %}
+                            <option value="{{ s.subject_id }}">{{ s.subject_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-warning text-dark btn-sm w-100 fw-semibold">
+                    <i class="bi bi-link me-1"></i> Link Subject to Class
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Overview Directory: Classes & Assigned Subjects -->
+    <div class="col-12 col-lg-8">
+        <div class="card custom-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Active Classes & Mapped Curriculum</h5>
+                <span class="badge bg-light text-dark border">{{ classes|length }} Classes</span>
+            </div>
+
+            {% if classes %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">Class Name</th>
+                                <th style="width: 20%;">Total Students</th>
+                                <th style="width: 55%;">Subjects Taught</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in classes %}
+                                <tr>
+                                    <td><strong class="fs-6">{{ c.class_name }}</strong></td>
+                                    <td>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary fw-semibold">
+                                            {{ c.students|length }} Enrolled
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if c.class_subjects %}
+                                            <div class="d-flex flex-wrap gap-1">
+                                                {% for cs in c.class_subjects %}
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                                        {{ cs.subject.subject_name }}
+                                                    </span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted small fst-italic">No subjects mapped yet</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No classes created yet.</div>
+            {% endif %}
+        </div>
+
+        <!-- Master Subjects Table -->
+        <div class="card custom-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Master Subjects Registry</h5>
+                <span class="badge bg-light text-dark border">{{ subjects|length }} Subjects</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject ID</th>
+                            <th>Subject Name</th>
+                            <th>Taught in Classes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in subjects %}
+                            <tr>
+                                <td><code>#{{ s.subject_id }}</code></td>
+                                <td class="fw-semibold">{{ s.subject_name }}</td>
+                                <td>
+                                    {% if s.class_subjects %}
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for cs in s.class_subjects %}
+                                                <span class="badge bg-info bg-opacity-10 text-info">
+                                                    {{ cs.class_obj.class_name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted small fst-italic">Not assigned to any class yet</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

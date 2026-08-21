@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Session Detail — Admin — AttendEase{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Header with Back Button -->
+    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <a href="{{ url_for('admin.view_attendance') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Back to Sessions
+                </a>
+                <h3 class="fw-bold mb-0">Session Detail & Audit Inspection</h3>
+            </div>
+            <p class="text-muted mb-0 small">Admin-only override: Unlock, correct with mandatory reason, and auto re-lock records</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <span class="badge bg-primary fs-6 px-3 py-2">{{ target_class.class_name }}</span>
+            <span class="badge bg-info text-dark fs-6 px-3 py-2">{{ target_subject.subject_name }}</span>
+            <span class="badge bg-secondary fs-6 px-3 py-2">{{ target_period.period_name }}</span>
+            <span class="badge bg-light text-dark border fs-6 px-3 py-2">{{ target_date }}</span>
+        </div>
+    </div>
+
+    <!-- Student Attendance List -->
+    <div class="col-12">
+        <div class="card custom-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Student Attendance Roster</h5>
+                <span class="badge bg-light text-dark border">{{ records|length }} Students</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Roll No</th>
+                            <th>Student Name</th>
+                            <th>Current Status</th>
+                            <th>Lock State</th>
+                            <th>Audit History</th>
+                            <th class="text-end">Admin Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in records %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2 py-1">
+                                        {{ r.student.roll_no }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">{{ r.student.user.name }}</span>
+                                    <div class="text-muted small">{{ r.student.user.email }}</div>
+                                </td>
+                                <td>
+                                    {% if r.status == 'present' %}
+                                        <span class="status-pill-present">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Present
+                                        </span>
+                                    {% else %}
+                                        <span class="status-pill-absent">
+                                            <i class="bi bi-x-circle-fill me-1"></i>Absent
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if r.locked %}
+                                        <span class="lock-badge"><i class="bi bi-lock-fill text-danger me-1"></i>Locked</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Open</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if r.corrections %}
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle" title="Has been corrected {{ r.corrections|length }} time(s)">
+                                            <i class="bi bi-clock-history me-1"></i>{{ r.corrections|length }} Correction(s)
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted small">Original Record</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('admin.correct_attendance', attendance_id=r.attendance_id) }}" class="btn btn-sm btn-outline-danger fw-semibold">
+                                        <i class="bi bi-unlock-fill me-1"></i> Unlock & Correct
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger-alert: #dc2626;
+    --danger-light: #fee2e2;
+    --success-color: #16a34a;
+    --warning-color: #d97706;
+    --bg-light: #f8fafc;
+    --card-border: #e2e8f0;
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar-custom {
+    background: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+.navbar-custom .nav-link {
+    color: #94a3b8;
+    font-weight: 500;
+    padding: 0.5rem 0.85rem;
+    transition: all 0.2s;
+}
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+    color: #ffffff;
+}
+
+/* Cards & Containers */
+.custom-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease-in-out;
+}
+.custom-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Red Alert for Low Attendance (< 75%) */
+.alert-badge-danger {
+    background-color: var(--danger-light);
+    color: var(--danger-alert);
+    font-weight: 700;
+    border: 1px solid #fca5a5;
+    padding: 0.35rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.alert-row-danger {
+    background-color: #fff1f2 !important;
+}
+
+.status-pill-present {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.status-pill-absent {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.lock-badge {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    border: 1px solid #cbd5e1;
+}
+
+/* Progress bar customizations */
+.progress-sm {
+    height: 8px;
+    border-radius: 4px;
+}
+
+/* Stat Cards */
+.stat-card {
+    border-radius: 12px;
+    padding: 1.25rem;
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Footer */
+footer {
+    background: #ffffff;
+    border-top: 1px solid var(--card-border);
+    padding: 1rem 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
