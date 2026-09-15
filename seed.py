@@ -4,7 +4,7 @@ from app import create_app
 from db import db
 from models import (
     User, Class, Subject, ClassSubject, TeacherSubject,
-    Student, Period, Attendance, AttendanceCorrection
+    Student, Period, Attendance, AttendanceCorrection, StudentMark
 )
 
 def seed_database():
@@ -227,8 +227,38 @@ def seed_database():
             )
             sample_att.status = "present"
             sample_att.locked = True
-            db.session.add(correction)
-            db.session.commit()
+        # Seed sample Continuous Internal Assessment (CIA) marks
+        print("Seeding Sample Student Marks...")
+        all_students = Student.query.all()
+        for stu in all_students:
+            # Seed DBMS marks
+            db.session.add(StudentMark(
+                student_id=stu.student_id,
+                subject_id=sub_dbms.subject_id,
+                teacher_id=teacher1.user_id,
+                midterm=18.0 if stu.student_id == rahul_student.student_id else 16.0,
+                assignment=9.0 if stu.student_id == rahul_student.student_id else 8.0,
+                total=27.0 if stu.student_id == rahul_student.student_id else 24.0
+            ))
+            # Seed Python marks
+            db.session.add(StudentMark(
+                student_id=stu.student_id,
+                subject_id=sub_python.subject_id,
+                teacher_id=teacher1.user_id,
+                midterm=17.0 if stu.student_id == rahul_student.student_id else 15.0,
+                assignment=8.5 if stu.student_id == rahul_student.student_id else 7.5,
+                total=25.5 if stu.student_id == rahul_student.student_id else 22.5
+            ))
+            # Seed Computer Networks marks
+            db.session.add(StudentMark(
+                student_id=stu.student_id,
+                subject_id=sub_cn.subject_id,
+                teacher_id=teacher2.user_id,
+                midterm=19.0 if stu.student_id == rahul_student.student_id else 14.0,
+                assignment=9.5 if stu.student_id == rahul_student.student_id else 8.0,
+                total=28.5 if stu.student_id == rahul_student.student_id else 22.0
+            ))
+        db.session.commit()
 
         print("Database seeded successfully!")
         print("\n=== Demo Credentials ===")

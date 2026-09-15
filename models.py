@@ -225,3 +225,40 @@ class AttendanceCorrection(db.Model):
             'reason': self.reason,
             'corrected_at': self.corrected_at.isoformat() if self.corrected_at else None
         }
+
+
+class StudentMark(db.Model):
+    __tablename__ = 'student_marks'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subjects.subject_id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    midterm = db.Column(db.Float, default=0.0, nullable=False)      # Max 20
+    assignment = db.Column(db.Float, default=0.0, nullable=False)   # Max 10
+    total = db.Column(db.Float, default=0.0, nullable=False)        # Max 30
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    # Relationships
+    student = db.relationship('Student', backref='marks_records', lazy=True)
+    subject = db.relationship('Subject', backref='marks_records', lazy=True)
+    teacher = db.relationship('User', backref='marks_submitted', lazy=True)
+
+    __table_args__ = (
+        db.UniqueConstraint('student_id', 'subject_id', name='unique_student_subject_mark'),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'student_id': self.student_id,
+            'student_name': self.student.user.name if (self.student and self.student.user) else None,
+            'roll_no': self.student.roll_no if self.student else None,
+            'subject_id': self.subject_id,
+            'subject_name': self.subject.subject_name if self.subject else None,
+            'midterm': self.midterm,
+            'assignment': self.assignment,
+            'total': self.total,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+

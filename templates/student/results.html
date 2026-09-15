@@ -11,7 +11,10 @@
                 <a href="{{ url_for('student.dashboard') }}" class="text-white fs-4">
                     <i class="bi bi-chevron-left"></i>
                 </a>
-                <h4 class="fw-bold mb-0 text-white">Academic Performance</h4>
+                <div>
+                    <h4 class="fw-bold mb-0 text-white">Academic Performance</h4>
+                    <span class="small text-white-50">Continuous Internal Assessment &amp; Semester Grades</span>
+                </div>
             </div>
         </div>
     </div>
@@ -20,47 +23,57 @@
     <div class="col-12">
         <div class="app-card text-center p-4">
             <div class="text-muted small fw-bold text-uppercase">Cumulative Grade Point Average (CGPA)</div>
-            <h1 class="fw-extrabold text-primary my-2">8.42 / 10.0</h1>
-            <span class="badge bg-success px-3 py-2">First Class with Distinction</span>
+            <h1 class="fw-extrabold text-primary my-2" data-counter data-target="{{ cgpa }}">{{ cgpa }} / 10.0</h1>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-bold">
+                <i class="bi bi-trophy-fill me-1"></i> First Class with Distinction
+            </span>
         </div>
     </div>
 
     <!-- Semester Scorecard -->
     <div class="col-12">
         <div class="app-card">
-            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-award text-primary me-2"></i>Semester 3 Performance</h6>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 small">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Subject</th>
-                            <th>Credits</th>
-                            <th>Grade</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="fw-bold">Database Management Systems</td>
-                            <td>4</td>
-                            <td><span class="badge bg-primary">A+</span></td>
-                            <td><span class="text-success fw-bold">Pass</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Python Programming</td>
-                            <td>4</td>
-                            <td><span class="badge bg-primary">A</span></td>
-                            <td><span class="text-success fw-bold">Pass</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Computer Networks</td>
-                            <td>4</td>
-                            <td><span class="badge bg-primary">A+</span></td>
-                            <td><span class="text-success fw-bold">Pass</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-secondary mb-0"><i class="bi bi-award-fill text-primary me-2"></i>Internal Assessment (CIA) Scorecard</h6>
+                <span class="badge bg-primary-subtle text-primary">{{ marks_list|length }} Subjects</span>
             </div>
+
+            {% if marks_list %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Subject</th>
+                                <th style="width: 100px;">Mid-Term (20)</th>
+                                <th style="width: 100px;">Assign (10)</th>
+                                <th style="width: 100px;">Total (30)</th>
+                                <th style="width: 80px;">Grade</th>
+                                <th style="width: 90px;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in marks_list %}
+                                <tr>
+                                    <td class="fw-bold text-dark">{{ m.subject_name }}</td>
+                                    <td>{{ m.midterm }}</td>
+                                    <td>{{ m.assignment }}</td>
+                                    <td><strong class="text-primary">{{ m.total }} / 30</strong></td>
+                                    <td><span class="badge bg-primary px-2 py-1">{{ m.grade }}</span></td>
+                                    <td>
+                                        {% if m.status == 'Pass' %}
+                                            <span class="badge-success-subtle">{{ m.status }}</span>
+                                        {% else %}
+                                            <span class="alert-badge-danger">{{ m.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0">No subject marks recorded yet.</p>
+            {% endif %}
         </div>
     </div>
 </div>

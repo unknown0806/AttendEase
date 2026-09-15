@@ -11,60 +11,198 @@
                 <a href="{{ url_for('teacher.dashboard') }}" class="text-white fs-4">
                     <i class="bi bi-chevron-left"></i>
                 </a>
-                <h4 class="fw-bold mb-0 text-white">Internal Assessment Marks</h4>
+                <div>
+                    <h4 class="fw-bold mb-0 text-white">Internal Assessment Marks</h4>
+                    <span class="small text-white-50">Enter and update student CIA marks (Mid-Term &amp; Assignment)</span>
+                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Class & Subject Selection Filter -->
+    <div class="col-12">
+        <div class="app-card p-3">
+            <form method="GET" action="{{ url_for('teacher.marks') }}" class="row g-2 align-items-center">
+                <div class="col-12 col-md-8">
+                    <label class="form-label small fw-bold text-secondary mb-1">Select Class &amp; Subject</label>
+                    <select name="class_subject" class="form-select form-select-sm" onchange="const [cid, sid] = this.value.split(':'); window.location='{{ url_for('teacher.marks') }}?class_id=' + cid + '&subject_id=' + sid;">
+                        {% for a in my_assignments %}
+                            <option value="{{ a.class_id }}:{{ a.subject_id }}" {% if a.class_id == selected_assignment.class_id and a.subject_id == selected_assignment.subject_id %}selected{% endif %}>
+                                {{ a.class_obj.class_name }} — {{ a.subject.subject_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 text-md-end pt-md-3">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 w-100">
+                        <i class="bi bi-book me-1"></i> {{ selected_subject.subject_name }}
+                    </span>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Marks Entry Table Card -->
     <div class="col-12">
         <div class="app-card">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold text-secondary mb-0"><i class="bi bi-pencil-fill text-primary me-2"></i>Continuous Internal Assessment (CIA - 30 Marks)</h6>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-2 border-bottom">
+                <div>
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-fill text-primary me-2"></i>Continuous Internal Assessment (CIA - 30 Marks)</h6>
+                    <span class="small text-muted">{{ selected_class.class_name }} &bull; Max: Mid-Term (20M) + Assignment (10M)</span>
+                </div>
                 <span class="badge bg-light text-dark border">{{ students|length }} Students</span>
             </div>
 
-            <form method="POST" action="{{ url_for('teacher.marks') }}">
-                <div class="table-responsive mb-3">
-                    <table class="table table-hover align-middle small mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Roll No</th>
-                                <th>Student Name</th>
-                                <th>Class</th>
-                                <th style="width: 120px;">Mid-Term (20)</th>
-                                <th style="width: 120px;">Assignment (10)</th>
-                                <th>Total (30)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for s in students %}
-                                <tr>
-                                    <td><code>{{ s.roll_no }}</code></td>
-                                    <td class="fw-bold">{{ s.user.name }}</td>
-                                    <td>{{ s.class_obj.class_name }}</td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm" value="{{ (loop.index * 3) % 5 + 15 }}" max="20" min="0">
-                                    </td>
-                                    <td>
-                                        <input type="number" class="form-control form-control-sm" value="{{ (loop.index * 2) % 3 + 7 }}" max="10" min="0">
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary px-2 py-1">{{ (loop.index * 3) % 5 + 15 + (loop.index * 2) % 3 + 7 }} / 30</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <form method="POST" action="{{ url_for('teacher.marks') }}" id="marksForm">
+                <input type="hidden" name="class_id" value="{{ selected_assignment.class_id }}">
+                <input type="hidden" name="subject_id" value="{{ selected_assignment.subject_id }}">
 
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary btn-sm px-4 fw-bold">
-                        <i class="bi bi-save me-1"></i> Save Marks
-                    </button>
-                </div>
+                {% if students %}
+                    <div class="table-responsive mb-3">
+                        <table class="table table-hover align-middle small mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 100px;">Roll No</th>
+                                    <th>Student</th>
+                                    <th style="width: 140px;">Mid-Term (Max 20)</th>
+                                    <th style="width: 140px;">Assignment (Max 10)</th>
+                                    <th style="width: 120px;">Total (Max 30)</th>
+                                    <th style="width: 100px;">Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in students %}
+                                    {% set mark = marks_map.get(s.student_id) %}
+                                    {% set mid = mark.midterm if mark else 15.0 %}
+                                    {% set assign = mark.assignment if mark else 8.0 %}
+                                    {% set tot = mark.total if mark else (mid + assign) %}
+                                    <tr data-student-row="{{ s.student_id }}">
+                                        <td><span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold">{{ s.roll_no }}</span></td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% if s.user.photo_url %}
+                                                    <img src="{{ s.user.photo_url }}" alt="{{ s.user.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 34px; height: 34px;">
+                                                {% else %}
+                                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px; font-size: 0.8rem;">
+                                                        {{ s.user.name[:2]|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ s.user.name }}</div>
+                                                    <div class="text-muted" style="font-size: 0.72rem;">{{ s.user.email }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   name="midterm_{{ s.student_id }}" 
+                                                   id="midterm_{{ s.student_id }}" 
+                                                   class="form-control form-control-sm mark-input mark-midterm" 
+                                                   value="{{ mid }}" 
+                                                   step="0.5" 
+                                                   min="0" 
+                                                   max="20" 
+                                                   data-student="{{ s.student_id }}" 
+                                                   required>
+                                        </td>
+                                        <td>
+                                            <input type="number" 
+                                                   name="assignment_{{ s.student_id }}" 
+                                                   id="assignment_{{ s.student_id }}" 
+                                                   class="form-control form-control-sm mark-input mark-assignment" 
+                                                   value="{{ assign }}" 
+                                                   step="0.5" 
+                                                   min="0" 
+                                                   max="10" 
+                                                   data-student="{{ s.student_id }}" 
+                                                   required>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary px-2.5 py-1.5 total-badge" id="total_{{ s.student_id }}">
+                                                {{ tot|round(1) }} / 30
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle grade-badge" id="grade_{{ s.student_id }}">
+                                                {% if tot >= 27 %}A+
+                                                {% elif tot >= 24 %}A
+                                                {% elif tot >= 20 %}B+
+                                                {% elif tot >= 15 %}B
+                                                {% else %}C{% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-4 border d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                        <div class="small text-muted">
+                            <i class="bi bi-info-circle-fill text-primary me-1"></i>
+                            Changes will be saved to the database and will update student grade reports immediately.
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i> Save Internal Marks
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info mb-0">No active students found in this class.</div>
+                {% endif %}
             </form>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function calculateRow(studentId) {
+            const midInput = document.getElementById('midterm_' + studentId);
+            const assignInput = document.getElementById('assignment_' + studentId);
+            const totalBadge = document.getElementById('total_' + studentId);
+            const gradeBadge = document.getElementById('grade_' + studentId);
+
+            if (!midInput || !assignInput || !totalBadge) return;
+
+            let mid = parseFloat(midInput.value) || 0;
+            let assign = parseFloat(assignInput.value) || 0;
+
+            // Constrain
+            if (mid > 20) { mid = 20; midInput.value = 20; }
+            if (mid < 0) { mid = 0; midInput.value = 0; }
+            if (assign > 10) { assign = 10; assignInput.value = 10; }
+            if (assign < 0) { assign = 0; assignInput.value = 0; }
+
+            const total = Math.round((mid + assign) * 10) / 10;
+            totalBadge.textContent = total + ' / 30';
+
+            // Grade calculation
+            let grade = 'C';
+            if (total >= 27) grade = 'A+';
+            else if (total >= 24) grade = 'A';
+            else if (total >= 20) grade = 'B+';
+            else if (total >= 15) grade = 'B';
+
+            if (gradeBadge) gradeBadge.textContent = grade;
+        }
+
+        document.querySelectorAll('.mark-input').forEach(input => {
+            input.addEventListener('input', (e) => {
+                const studentId = e.target.getAttribute('data-student');
+                calculateRow(studentId);
+            });
+        });
+
+        const marksForm = document.getElementById('marksForm');
+        if (marksForm) {
+            marksForm.addEventListener('submit', () => {
+                if (window.AttendXAnim && typeof window.AttendXAnim.toast === 'function') {
+                    window.AttendXAnim.toast('Saving Marks', 'Writing internal assessment scores to database...', 'info', 2500);
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

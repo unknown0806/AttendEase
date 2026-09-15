@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from db import db
-from models import User, Class, Subject, TeacherSubject, Student, Period, Attendance
+from models import User, Class, Subject, TeacherSubject, Student, Period, Attendance, StudentMark
 from auth import role_required, get_current_user
 
 teacher_bp = Blueprint('teacher', __name__)
@@ -267,17 +267,96 @@ def marks():
     teacher_id = session.get('user_id')
     user = get_current_user()
     my_assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
-    class_ids = [a.class_id for a in my_assignments]
+
+    if not my_assignments:
+        flash('You do not have any assigned classes to enter marks for.', 'warning')
+        return redirect(url_for('teacher.dashboard'))
+
+    # Determine selected class & subject
+    class_id_arg = request.values.get('class_id', type=int)
+    subject_id_arg = request.values.get('subject_id', type=int)
+
+    selected_assignment = None
+    if class_id_arg and subject_id_arg:
+        selected_assignment = next(
+            (a for a in my_assignments if a.class_id == class_id_arg and a.subject_id == subject_id_arg),
+            None
+        )
+
+    if not selected_assignment:
+        selected_assignment = my_assignments[0]
+
+    selected_class = selected_assignment.class_obj
+    selected_subject = selected_assignment.subject
+
+    # Fetch active students in this assigned class
     students = Student.query.join(User).filter(
-        Student.class_id.in_(class_ids),
+        Student.class_id == selected_assignment.class_id,
         User.active == True
-    ).order_by(Student.roll_no).all() if class_ids else []
+    ).order_by(Student.roll_no).all()
 
     if request.method == 'POST':
-        flash('Continuous Internal Assessment (CIA) marks recorded and saved!', 'success')
-        return redirect(url_for('teacher.marks'))
+        saved_count = 0
+        for s in students:
+            midterm_val = request.form.get(f'midterm_{s.student_id}')
+            assignment_val = request.form.get(f'assignment_{s.student_id}')
 
-    return render_template('teacher/marks.html', user=user, students=students, my_assignments=my_assignments)
+            if midterm_val is not None and assignment_val is not None:
+                try:
+                    m_float = max(0.0, min(20.0, float(midterm_val)))
+                except (ValueError, TypeError):
+                    m_float = 0.0
+
+                try:
+                    a_float = max(0.0, min(10.0, float(assignment_val)))
+                except (ValueError, TypeError):
+                    a_float = 0.0
+
+                tot_float = round(m_float + a_float, 2)
+
+                # Upsert StudentMark record
+                mark_rec = StudentMark.query.filter_by(
+                    student_id=s.student_id,
+                    subject_id=selected_assignment.subject_id
+                ).first()
+
+                if mark_rec:
+                    mark_rec.midterm = m_float
+                    mark_rec.assignment = a_float
+                    mark_rec.total = tot_float
+                    mark_rec.teacher_id = teacher_id
+                    mark_rec.updated_at = datetime.utcnow()
+                else:
+                    mark_rec = StudentMark(
+                        student_id=s.student_id,
+                        subject_id=selected_assignment.subject_id,
+                        teacher_id=teacher_id,
+                        midterm=m_float,
+                        assignment=a_float,
+                        total=tot_float
+                    )
+                    db.session.add(mark_rec)
+
+                saved_count += 1
+
+        db.session.commit()
+        flash(f'Internal assessment marks for {selected_subject.subject_name} ({selected_class.class_name}) saved successfully for {saved_count} students!', 'success')
+        return redirect(url_for('teacher.marks', class_id=selected_assignment.class_id, subject_id=selected_assignment.subject_id))
+
+    # Fetch existing marks for this subject
+    existing_marks = StudentMark.query.filter_by(subject_id=selected_assignment.subject_id).all()
+    marks_map = {m.student_id: m for m in existing_marks}
+
+    return render_template(
+        'teacher/marks.html',
+        user=user,
+        students=students,
+        my_assignments=my_assignments,
+        selected_assignment=selected_assignment,
+        selected_class=selected_class,
+        selected_subject=selected_subject,
+        marks_map=marks_map
+    )
 
 @teacher_bp.route('/timetable')
 @role_required('teacher')
