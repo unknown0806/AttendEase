@@ -1,5 +1,8 @@
+import os
+import time
 from datetime import datetime, date
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, current_app
 from db import db
 from models import (
     User, Class, Subject, ClassSubject, TeacherSubject,
@@ -8,6 +11,25 @@ from models import (
 from auth import role_required, get_current_user
 
 admin_bp = Blueprint('admin', __name__)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_avatar_file(file_storage, prefix='avatar'):
+    if not file_storage or not file_storage.filename:
+        return None
+    if not allowed_file(file_storage.filename):
+        return None
+    ext = file_storage.filename.rsplit('.', 1)[1].lower()
+    clean_prefix = secure_filename(prefix).replace('.', '_')
+    filename = f"{clean_prefix}_{int(time.time() * 1000)}.{ext}"
+    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads', 'avatars')
+    os.makedirs(upload_folder, exist_ok=True)
+    file_path = os.path.join(upload_folder, filename)
+    file_storage.save(file_path)
+    return f"/static/uploads/avatars/{filename}"
 
 @admin_bp.route('/dashboard')
 @role_required('admin')
@@ -44,6 +66,8 @@ def manage_students():
         password = request.form.get('password', 'student123').strip()
         roll_no = request.form.get('roll_no', '').strip()
         class_id = request.form.get('class_id', type=int)
+        photo_url_input = request.form.get('photo_url', '').strip()
+        photo_file = request.files.get('photo_file')
 
         if not name or not email or not roll_no or not class_id:
             flash('All student fields are required.', 'danger')
@@ -57,9 +81,17 @@ def manage_students():
             flash('A student with this roll number already exists.', 'danger')
             return redirect(url_for('admin.manage_students'))
 
+        # Handle photo
+        final_photo = None
+        saved_file = save_avatar_file(photo_file, prefix=f"stu_{roll_no}")
+        if saved_file:
+            final_photo = saved_file
+        elif photo_url_input:
+            final_photo = photo_url_input
+
         try:
             # Atomic creation of User and Student records
-            new_user = User(name=name, email=email, role='student', active=True)
+            new_user = User(name=name, email=email, role='student', photo_url=final_photo, active=True)
             new_user.set_password(password if password else 'student123')
             db.session.add(new_user)
             db.session.flush() # populate user_id
@@ -104,6 +136,8 @@ def edit_student(student_id):
     name = request.form.get('name', '').strip()
     roll_no = request.form.get('roll_no', '').strip()
     class_id = request.form.get('class_id', type=int)
+    photo_url_input = request.form.get('photo_url', '').strip()
+    photo_file = request.files.get('photo_file')
 
     if not name or not roll_no or not class_id:
         flash('Name, roll number, and class are required.', 'danger')
@@ -114,6 +148,13 @@ def edit_student(student_id):
     if existing:
         flash('Roll number already assigned to another student.', 'danger')
         return redirect(url_for('admin.manage_students'))
+
+    # Handle photo update
+    saved_file = save_avatar_file(photo_file, prefix=f"stu_{roll_no}")
+    if saved_file:
+        student.user.photo_url = saved_file
+    elif photo_url_input:
+        student.user.photo_url = photo_url_input
 
     student.user.name = name
     student.roll_no = roll_no
@@ -144,6 +185,8 @@ def manage_teachers():
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
         password = request.form.get('password', 'teacher123').strip()
+        photo_url_input = request.form.get('photo_url', '').strip()
+        photo_file = request.files.get('photo_file')
 
         if not name or not email:
             flash('Name and email are required.', 'danger')
@@ -153,7 +196,15 @@ def manage_teachers():
             flash('A user with this email already exists.', 'danger')
             return redirect(url_for('admin.manage_teachers'))
 
-        new_teacher = User(name=name, email=email, role='teacher', active=True)
+        # Handle photo
+        final_photo = None
+        saved_file = save_avatar_file(photo_file, prefix="faculty")
+        if saved_file:
+            final_photo = saved_file
+        elif photo_url_input:
+            final_photo = photo_url_input
+
+        new_teacher = User(name=name, email=email, role='teacher', photo_url=final_photo, active=True)
         new_teacher.set_password(password if password else 'teacher123')
         db.session.add(new_teacher)
         db.session.commit()
@@ -180,6 +231,8 @@ def edit_teacher(teacher_id):
     teacher = User.query.filter_by(user_id=teacher_id, role='teacher').first_or_404()
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
+    photo_url_input = request.form.get('photo_url', '').strip()
+    photo_file = request.files.get('photo_file')
 
     if not name or not email:
         flash('Name and email are required.', 'danger')
@@ -189,6 +242,12 @@ def edit_teacher(teacher_id):
     if existing:
         flash('Email already used by another user.', 'danger')
         return redirect(url_for('admin.manage_teachers'))
+
+    saved_file = save_avatar_file(photo_file, prefix=f"faculty_{teacher_id}")
+    if saved_file:
+        teacher.photo_url = saved_file
+    elif photo_url_input:
+        teacher.photo_url = photo_url_input
 
     teacher.name = name
     teacher.email = email
@@ -486,10 +545,57 @@ def correct_attendance(attendance_id):
     return render_template('admin/correct_attendance.html', attendance=attendance)
 
 # ==========================================
-# ADMIN — AUDIT LOG
+# ADMIN — AUDIT LOG & REPORTS
 # ==========================================
 @admin_bp.route('/audit-log')
 @role_required('admin')
 def audit_log():
     corrections = AttendanceCorrection.query.order_by(AttendanceCorrection.corrected_at.desc()).all()
     return render_template('admin/audit_log.html', corrections=corrections)
+
+@admin_bp.route('/reports')
+@role_required('admin')
+def reports():
+    students = Student.query.join(User).filter(User.active == True).all()
+    classes = Class.query.all()
+    subjects = Subject.query.all()
+    
+    # Calculate shortage list
+    shortage_list = []
+    for stu in students:
+        total = Attendance.query.filter_by(student_id=stu.student_id).count()
+        present = Attendance.query.filter_by(student_id=stu.student_id, status='present').count()
+        if total > 0:
+            pct = round((present / total) * 100, 1)
+            if pct < 75.0:
+                shortage_list.append({
+                    'student': stu,
+                    'total': total,
+                    'present': present,
+                    'percentage': pct
+                })
+                
+    return render_template('admin/reports.html', students=students, classes=classes, subjects=subjects, shortage_list=shortage_list)
+
+@admin_bp.route('/notices', methods=['GET', 'POST'])
+@role_required('admin')
+def notices():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        flash(f'Notice "{title}" broadcasted to all campus portals!', 'success')
+        return redirect(url_for('admin.notices'))
+    return render_template('admin/notices.html')
+
+@admin_bp.route('/timetable')
+@role_required('admin')
+def timetable():
+    classes = Class.query.all()
+    periods = Period.query.order_by(Period.period_id).all()
+    return render_template('admin/timetable.html', classes=classes, periods=periods)
+
+@admin_bp.route('/profile')
+@role_required('admin')
+def profile():
+    user = get_current_user()
+    return render_template('admin/profile.html', user=user)
+

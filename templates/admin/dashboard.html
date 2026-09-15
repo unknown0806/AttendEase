@@ -1,149 +1,165 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard — AttendEase{% endblock %}
+{% block title %}Admin Control Center — AttendX{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Header -->
+<div class="row g-3 py-2">
+    <!-- Top Header -->
     <div class="col-12">
-        <div class="card custom-card bg-dark text-white p-4 border-0 shadow-sm">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="app-top-header">
+            <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="fw-bold mb-1">Administrator Control Center 🛡️</h2>
-                    <p class="mb-0 text-white-50">Welcome, {{ current_user.name }} &bull; System Governance, Master Data, and Audited Attendance Corrections</p>
-                </div>
-                <div>
-                    <a href="{{ url_for('admin.view_attendance') }}" class="btn btn-primary fw-semibold">
-                        <i class="bi bi-search me-1"></i> View Attendance Records
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Metric Cards -->
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-2">
-                <i class="bi bi-people"></i>
-            </div>
-            <div class="text-muted small">Total Students</div>
-            <div class="fs-4 fw-bold">{{ total_students }}</div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-2">
-                <i class="bi bi-person-workspace"></i>
-            </div>
-            <div class="text-muted small">Total Teachers</div>
-            <div class="fs-4 fw-bold">{{ total_teachers }}</div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-info bg-opacity-10 text-info mx-auto mb-2">
-                <i class="bi bi-building"></i>
-            </div>
-            <div class="text-muted small">Classes</div>
-            <div class="fs-4 fw-bold">{{ total_classes }}</div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-2">
-                <i class="bi bi-book"></i>
-            </div>
-            <div class="text-muted small">Subjects</div>
-            <div class="fs-4 fw-bold">{{ total_subjects }}</div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-secondary bg-opacity-10 text-secondary mx-auto mb-2">
-                <i class="bi bi-table"></i>
-            </div>
-            <div class="text-muted small">Attendance Logs</div>
-            <div class="fs-4 fw-bold">{{ total_attendance_records }}</div>
-        </div>
-    </div>
-
-    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
-        <div class="stat-card shadow-sm text-center">
-            <div class="stat-icon bg-danger bg-opacity-10 text-danger mx-auto mb-2">
-                <i class="bi bi-shield-check"></i>
-            </div>
-            <div class="text-muted small">Corrections</div>
-            <div class="fs-4 fw-bold text-danger">{{ total_corrections }}</div>
-        </div>
-    </div>
-
-    <!-- Quick Navigation Cards -->
-    <div class="col-12 col-lg-7">
-        <div class="card custom-card p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="bi bi-gear-wide-connected text-primary me-2"></i>Administration Modules</h5>
-            <div class="row g-3">
-                <div class="col-12 col-md-6">
-                    <div class="p-3 border rounded-3 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <h6 class="fw-bold"><i class="bi bi-people text-primary me-2"></i>Manage Students</h6>
-                            <p class="text-muted small mb-3">Add new admissions, edit details, assign classes, and soft-delete/deactivate accounts.</p>
-                        </div>
-                        <a href="{{ url_for('admin.manage_students') }}" class="btn btn-outline-primary btn-sm">
-                            Open Students Directory <i class="bi bi-arrow-right"></i>
-                        </a>
+                    <div class="small text-white-50 fw-semibold">Administration &amp; Governance</div>
+                    <h3 class="fw-extrabold mb-0 text-white text-uppercase letter-spacing-1">{{ current_user.name }}</h3>
+                    <div class="small text-white-50 mt-1">
+                        <span class="badge bg-danger text-white me-1"><i class="bi bi-shield-check"></i> Super Admin</span>
+                        <span>Institutional Attendance &amp; Audited Override Authority</span>
                     </div>
                 </div>
-
-                <div class="col-12 col-md-6">
-                    <div class="p-3 border rounded-3 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <h6 class="fw-bold"><i class="bi bi-person-workspace text-success me-2"></i>Manage Teachers</h6>
-                            <p class="text-muted small mb-3">Onboard faculty members and map them to classes and subject pairings.</p>
-                        </div>
-                        <a href="{{ url_for('admin.manage_teachers') }}" class="btn btn-outline-success btn-sm">
-                            Open Teachers Directory <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
+                <div class="avatar-circle">
+                    <i class="bi bi-shield-lock-fill"></i>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="col-12 col-md-6">
-                    <div class="p-3 border rounded-3 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <h6 class="fw-bold"><i class="bi bi-building text-info me-2"></i>Classes & Subjects</h6>
-                            <p class="text-muted small mb-3">Create sections (e.g. BCA 3A) and curriculum subjects, then link them together.</p>
-                        </div>
-                        <a href="{{ url_for('admin.manage_classes') }}" class="btn btn-outline-info btn-sm">
-                            Configure Curriculum <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
+    <!-- Institutional Stat Cards Row -->
+    <div class="col-12">
+        <div class="row g-2">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-primary fs-3 mb-1"><i class="bi bi-people-fill"></i></div>
+                    <div class="text-muted small fw-bold">Students</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_students }}</div>
                 </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-success fs-3 mb-1"><i class="bi bi-person-workspace"></i></div>
+                    <div class="text-muted small fw-bold">Faculty</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_teachers }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-info fs-3 mb-1"><i class="bi bi-building"></i></div>
+                    <div class="text-muted small fw-bold">Classes</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_classes }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-warning fs-3 mb-1"><i class="bi bi-book-half"></i></div>
+                    <div class="text-muted small fw-bold">Subjects</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_subjects }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-secondary fs-3 mb-1"><i class="bi bi-table"></i></div>
+                    <div class="text-muted small fw-bold">Attendance Logs</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_attendance_records }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-danger fs-3 mb-1"><i class="bi bi-shield-lock-fill"></i></div>
+                    <div class="text-muted small fw-bold">Corrections</div>
+                    <div class="fs-4 fw-extrabold text-danger">{{ total_corrections }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="col-12 col-md-6">
-                    <div class="p-3 border rounded-3 h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <h6 class="fw-bold"><i class="bi bi-shield-lock text-danger me-2"></i>Audit & Corrections</h6>
-                            <p class="text-muted small mb-3">Inspect locked attendance records, execute audited corrections, and view change logs.</p>
-                        </div>
-                        <a href="{{ url_for('admin.audit_log') }}" class="btn btn-outline-danger btn-sm">
-                            View Audit Trail <i class="bi bi-arrow-right"></i>
-                        </a>
+    <!-- Admin Quick Actions Grid -->
+    <div class="col-12">
+        <div class="app-card">
+            <h6 class="fw-bold mb-4 text-secondary"><i class="bi bi-grid-fill text-primary me-2"></i>Administration Modules</h6>
+
+            <div class="actions-grid">
+                <!-- 1. Manage Students -->
+                <a href="{{ url_for('admin.manage_students') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-people-fill"></i>
                     </div>
-                </div>
+                    <span class="action-label">Students</span>
+                </a>
+
+                <!-- 2. Manage Teachers -->
+                <a href="{{ url_for('admin.manage_teachers') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                    <span class="action-label">Teachers</span>
+                </a>
+
+                <!-- 3. Curriculum & Classes -->
+                <a href="{{ url_for('admin.manage_classes') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <span class="action-label">Curriculum</span>
+                </a>
+
+                <!-- 4. Institutional Attendance -->
+                <a href="{{ url_for('admin.view_attendance') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-table"></i>
+                    </div>
+                    <span class="action-label">Attendance</span>
+                </a>
+
+                <!-- 5. Audit Log -->
+                <a href="{{ url_for('admin.audit_log') }}" class="action-item">
+                    <div class="action-circle-btn" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <span class="action-label">Audit Log</span>
+                </a>
+
+                <!-- 6. Shortage Reports -->
+                <a href="{{ url_for('admin.reports') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-bar-chart-line-fill"></i>
+                    </div>
+                    <span class="action-label">Reports</span>
+                </a>
+
+                <!-- 7. Timetable -->
+                <a href="{{ url_for('admin.timetable') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-calendar-week-fill"></i>
+                    </div>
+                    <span class="action-label">Timetable</span>
+                </a>
+
+                <!-- 8. Broadcast Notices -->
+                <a href="{{ url_for('admin.notices') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-megaphone-fill"></i>
+                    </div>
+                    <span class="action-label">Notices</span>
+                </a>
+
+                <!-- 9. Admin Profile -->
+                <a href="{{ url_for('admin.profile') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-gear-fill"></i>
+                    </div>
+                    <span class="action-label">Settings</span>
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Recent Audited Corrections -->
-    <div class="col-12 col-lg-5">
-        <div class="card custom-card p-4 h-100">
+    <div class="col-12">
+        <div class="app-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0"><i class="bi bi-journal-check text-danger me-2"></i>Recent Corrections</h5>
-                <a href="{{ url_for('admin.audit_log') }}" class="small text-decoration-none">View All</a>
+                <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-journal-check text-danger me-2"></i>Recent Audited Overrides</h6>
+                <a href="{{ url_for('admin.audit_log') }}" class="text-danger text-decoration-none small fw-bold">
+                    View Master Log <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
 
             {% if recent_corrections %}
@@ -151,21 +167,21 @@
                     {% for c in recent_corrections %}
                         <div class="list-group-item px-0 py-2 border-bottom">
                             <div class="d-flex justify-content-between align-items-start mb-1">
-                                <span class="fw-bold">{{ c.attendance_record.student.user.name }} ({{ c.attendance_record.student.roll_no }})</span>
+                                <span class="fw-bold text-dark">{{ c.attendance_record.student.user.name }} ({{ c.attendance_record.student.roll_no }})</span>
                                 <span class="badge bg-light text-dark border">{{ c.corrected_at.strftime('%d %b, %H:%M') }}</span>
                             </div>
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <span class="badge bg-danger-subtle text-danger">{{ c.old_status|upper }}</span>
+                                <span class="alert-badge-danger">{{ c.old_status|upper }}</span>
                                 <i class="bi bi-arrow-right small text-muted"></i>
-                                <span class="badge bg-success-subtle text-success">{{ c.new_status|upper }}</span>
-                                <span class="text-muted" style="font-size: 0.75rem;">by {{ c.admin.name }}</span>
+                                <span class="badge-success-subtle">{{ c.new_status|upper }}</span>
+                                <span class="text-muted" style="font-size: 0.72rem;">Authorized by {{ c.admin.name }}</span>
                             </div>
                             <div class="text-muted fst-italic">"{{ c.reason }}"</div>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="text-muted small py-3 text-center">No corrections logged yet. System is 100% in sync.</div>
+                <p class="text-muted small mb-0">All submitted records remain locked with zero overrides.</p>
             {% endif %}
         </div>
     </div>

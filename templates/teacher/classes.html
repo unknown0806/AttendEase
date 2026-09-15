@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}My Assigned Classes — Faculty Portal{% endblock %}
+
+{% block content %}
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('teacher.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <h4 class="fw-bold mb-0 text-white">My Classes & Curriculum</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Classes List -->
+    <div class="col-12">
+        <div class="app-card">
+            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-mortarboard-fill text-primary me-2"></i>Active Teaching Load</h6>
+            <div class="list-group list-group-flush">
+                {% for a in assignments %}
+                    <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">{{ a.class_obj.class_name }}</h5>
+                            <span class="badge bg-primary px-3 py-1">{{ a.subject.subject_name }}</span>
+                            <span class="text-muted small ms-2">{{ a.class_obj.students|length }} Enrolled Students</span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('teacher.my_students') }}" class="btn btn-outline-secondary btn-sm fw-bold">
+                                <i class="bi bi-people"></i> Roster
+                            </a>
+                            <a href="{{ url_for('teacher.mark_attendance', class_id=a.class_id, subject_id=a.subject_id) }}" class="btn btn-primary btn-sm fw-bold">
+                                <i class="bi bi-pen"></i> Mark
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,120 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AttendEase — Smart Attendance Management System{% endblock %}</title>
+    <title>{% block title %}AttendX — College Management & Attendance{% endblock %}</title>
     
     <!-- Bootstrap 5 CSS & Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     
-    <!-- Custom Style -->
+    <!-- Custom Style matching reference screenshot -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
-                <i class="bi bi-shield-check text-primary fs-4"></i>
-                <span>AttendEase</span>
-                <span class="badge bg-primary text-white" style="font-size: 0.65rem;">MVP</span>
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    {% if logged_in %}
-                        {% if user_role == 'teacher' %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'teacher.dashboard' %}active{% endif %}" href="{{ url_for('teacher.dashboard') }}">
-                                    <i class="bi bi-speedometer2 me-1"></i> My Classes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'teacher.mark_attendance' %}active{% endif %}" href="{{ url_for('teacher.mark_attendance') }}">
-                                    <i class="bi bi-check2-square me-1"></i> Mark Attendance
-                                </a>
-                            </li>
-                        {% elif user_role == 'student' %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}" href="{{ url_for('student.dashboard') }}">
-                                    <i class="bi bi-person-badge me-1"></i> My Attendance
-                                </a>
-                            </li>
-                        {% elif user_role == 'admin' %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
-                                    <i class="bi bi-grid-1x2 me-1"></i> Overview
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.manage_students' %}active{% endif %}" href="{{ url_for('admin.manage_students') }}">
-                                    <i class="bi bi-people me-1"></i> Students
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.manage_teachers' %}active{% endif %}" href="{{ url_for('admin.manage_teachers') }}">
-                                    <i class="bi bi-person-workspace me-1"></i> Teachers
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.manage_classes' %}active{% endif %}" href="{{ url_for('admin.manage_classes') }}">
-                                    <i class="bi bi-building me-1"></i> Classes & Subjects
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.view_attendance' or request.endpoint == 'admin.view_session_detail' %}active{% endif %}" href="{{ url_for('admin.view_attendance') }}">
-                                    <i class="bi bi-table me-1"></i> View Attendance
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.endpoint == 'admin.audit_log' %}active{% endif %}" href="{{ url_for('admin.audit_log') }}">
-                                    <i class="bi bi-journal-text me-1"></i> Audit Trail
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
+<body class="{% block body_class %}{% endblock %}">
+
+    {% if logged_in and not hide_header %}
+        <!-- Desktop / Tablet Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark d-none d-md-flex" style="background: #10376d; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div class="container px-4">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('index') }}">
+                    <i class="bi bi-cloud-check-fill text-info fs-4"></i>
+                    <span class="fw-bold">AttendX</span>
+                    <span class="badge bg-primary-subtle text-primary" style="font-size: 0.65rem;">COLLEGE ERP</span>
+                </a>
                 
-                <div class="d-flex align-items-center gap-3">
-                    {% if logged_in %}
-                        <div class="text-light d-flex align-items-center gap-2">
-                            <span class="badge bg-secondary text-uppercase" style="font-size: 0.7rem;">{{ user_role }}</span>
-                            <span class="fw-semibold text-white">{{ current_user.name }}</span>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        {% if user_role == 'student' %}
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.dashboard' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.dashboard') }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.attendance_page' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.attendance_page') }}">Attendance</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.schedule' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.schedule') }}">Schedule</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.assignments' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.assignments') }}">Assignments</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.fees' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.fees') }}">Fees</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'student.notices' %}active text-white fw-bold{% endif %}" href="{{ url_for('student.notices') }}">Notices</a></li>
+                        {% elif user_role == 'teacher' %}
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.dashboard' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.dashboard') }}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.mark_attendance' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.mark_attendance') }}">Mark Attendance</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.my_classes' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.my_classes') }}">My Classes</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.my_students' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.my_students') }}">Students</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.assignments' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.assignments') }}">Assignments</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'teacher.marks' %}active text-white fw-bold{% endif %}" href="{{ url_for('teacher.marks') }}">Enter Marks</a></li>
+                        {% elif user_role == 'admin' %}
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.dashboard') }}">Overview</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.manage_students' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.manage_students') }}">Students</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.manage_teachers' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.manage_teachers') }}">Faculty</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.manage_classes' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.manage_classes') }}">Curriculum</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.view_attendance' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.view_attendance') }}">Attendance</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.audit_log' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.audit_log') }}">Audit Log</a></li>
+                            <li class="nav-item"><a class="nav-link {% if request.endpoint == 'admin.reports' %}active text-white fw-bold{% endif %}" href="{{ url_for('admin.reports') }}">Reports</a></li>
+                        {% endif %}
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-white d-flex align-items-center gap-2">
+                            <div class="avatar-circle" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                                {{ current_user.name[0] if current_user else 'U' }}
+                            </div>
+                            <span class="small fw-semibold">{{ current_user.name }}</span>
+                            <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem;">{{ user_role }}</span>
                         </div>
-                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm d-flex align-items-center gap-1">
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
-                    {% else %}
-                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm px-3">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
-                        </a>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    {% endif %}
 
     <!-- Flash Messages Container -->
-    <div class="container mt-3">
+    <div class="app-container mt-2">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm border-0 rounded-4 my-2" role="alert">
                         {% if category == 'success' %}
-                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <i class="bi bi-check-circle-fill me-2 text-success"></i>
                         {% elif category == 'danger' %}
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>
                         {% elif category == 'warning' %}
-                            <i class="bi bi-exclamation-circle-fill me-2"></i>
+                            <i class="bi bi-exclamation-circle-fill me-2 text-warning"></i>
                         {% else %}
-                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <i class="bi bi-info-circle-fill me-2 text-info"></i>
                         {% endif %}
-                        {{ message }}
+                        <span class="fw-semibold">{{ message }}</span>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
@@ -124,24 +92,66 @@
         {% endwith %}
     </div>
 
-    <!-- Main Body Content -->
-    <main class="container-fluid px-4 py-3">
+    <!-- Main App Container -->
+    <main class="app-container">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-auto">
-        <div class="container-fluid px-4 d-flex justify-content-between align-items-center">
-            <div>
-                <strong>AttendEase</strong> &copy; 2026 — Smart Attendance Management System
-            </div>
-            <div class="text-muted small">
-                <span class="me-3"><i class="bi bi-lock-fill text-success"></i> Tamper-Proof Locking</span>
-                <span class="me-3"><i class="bi bi-exclamation-octagon-fill text-danger"></i> 75% Risk Alert</span>
-                <span><i class="bi bi-shield-lock-fill text-primary"></i> Audited Corrections</span>
-            </div>
+    {% if logged_in and not hide_bottom_nav %}
+        <!-- Mobile Bottom Navigation Bar (Matching Reference Screenshot) -->
+        <div class="mobile-bottom-nav d-flex d-md-none">
+            {% if user_role == 'student' %}
+                <a href="{{ url_for('student.dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'student.dashboard' %}active{% endif %}" title="Home">
+                    <i class="bi bi-house-door-fill"></i>
+                </a>
+                <a href="{{ url_for('student.messages') }}" class="bottom-nav-item {% if request.endpoint == 'student.messages' %}active{% endif %}" title="Messages">
+                    <i class="bi bi-chat-dots-fill"></i>
+                </a>
+                <a href="{{ url_for('student.attendance_page') }}" class="bottom-nav-item {% if request.endpoint == 'student.attendance_page' %}active{% endif %}" title="Attendance">
+                    <i class="bi bi-person-vcard-fill"></i>
+                </a>
+                <a href="{{ url_for('student.notifications') }}" class="bottom-nav-item {% if request.endpoint == 'student.notifications' %}active{% endif %}" title="Notifications">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="nav-badge">1</span>
+                </a>
+                <a href="{{ url_for('student.profile') }}" class="bottom-nav-item {% if request.endpoint == 'student.profile' %}active{% endif %}" title="Profile">
+                    <i class="bi bi-person-fill"></i>
+                </a>
+            {% elif user_role == 'teacher' %}
+                <a href="{{ url_for('teacher.dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'teacher.dashboard' %}active{% endif %}" title="Home">
+                    <i class="bi bi-house-door-fill"></i>
+                </a>
+                <a href="{{ url_for('teacher.mark_attendance') }}" class="bottom-nav-item {% if request.endpoint == 'teacher.mark_attendance' %}active{% endif %}" title="Mark Attendance">
+                    <i class="bi bi-check2-square"></i>
+                </a>
+                <a href="{{ url_for('teacher.my_classes') }}" class="bottom-nav-item {% if request.endpoint == 'teacher.my_classes' or request.endpoint == 'teacher.my_students' %}active{% endif %}" title="My Classes">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </a>
+                <a href="{{ url_for('teacher.notifications') }}" class="bottom-nav-item {% if request.endpoint == 'teacher.notifications' %}active{% endif %}" title="Notifications">
+                    <i class="bi bi-bell-fill"></i>
+                </a>
+                <a href="{{ url_for('teacher.profile') }}" class="bottom-nav-item {% if request.endpoint == 'teacher.profile' %}active{% endif %}" title="Profile">
+                    <i class="bi bi-person-fill"></i>
+                </a>
+            {% elif user_role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" title="Home">
+                    <i class="bi bi-grid-fill"></i>
+                </a>
+                <a href="{{ url_for('admin.manage_students') }}" class="bottom-nav-item {% if request.endpoint == 'admin.manage_students' %}active{% endif %}" title="Students">
+                    <i class="bi bi-people-fill"></i>
+                </a>
+                <a href="{{ url_for('admin.view_attendance') }}" class="bottom-nav-item {% if request.endpoint == 'admin.view_attendance' %}active{% endif %}" title="Attendance">
+                    <i class="bi bi-table"></i>
+                </a>
+                <a href="{{ url_for('admin.audit_log') }}" class="bottom-nav-item {% if request.endpoint == 'admin.audit_log' %}active{% endif %}" title="Audit Log">
+                    <i class="bi bi-shield-check"></i>
+                </a>
+                <a href="{{ url_for('admin.profile') }}" class="bottom-nav-item {% if request.endpoint == 'admin.profile' %}active{% endif %}" title="Profile">
+                    <i class="bi bi-gear-fill"></i>
+                </a>
+            {% endif %}
         </div>
-    </footer>
+    {% endif %}
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

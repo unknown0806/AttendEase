@@ -20,6 +20,7 @@ def seed_database():
             name="Priya Rao",
             email="priya@college.edu",
             role="admin",
+            photo_url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
             active=True
         )
         admin.set_password("admin123")
@@ -30,6 +31,7 @@ def seed_database():
             name="Suresh Kumar",
             email="suresh@college.edu",
             role="teacher",
+            photo_url="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
             active=True
         )
         teacher1.set_password("teacher123")
@@ -39,6 +41,7 @@ def seed_database():
             name="Meera Patel",
             email="meera@college.edu",
             role="teacher",
+            photo_url="https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=150&auto=format&fit=crop&q=80",
             active=True
         )
         teacher2.set_password("teacher123")
@@ -46,21 +49,22 @@ def seed_database():
 
         # Student Users
         students_raw = [
-            ("Rahul Sharma", "rahul@student.edu", "BCA21", "BCA 3A"),
-            ("Anita Verma", "anita@student.edu", "BCA22", "BCA 3A"),
-            ("Rohan Gupta", "rohan@student.edu", "BCA23", "BCA 3A"),
-            ("Sneha Reddy", "sneha@student.edu", "BCA24", "BCA 3A"),
-            ("Amit Singh", "amit@student.edu", "BCA25", "BCA 3A"),
-            ("Pooja Joshi", "pooja@student.edu", "BCA31", "BCA 3B"),
-            ("Vikas Nair", "vikas@student.edu", "BCA32", "BCA 3B"),
+            ("Rahul Sharma", "rahul@student.edu", "BCA21", "BCA 3A", "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80"),
+            ("Anita Verma", "anita@student.edu", "BCA22", "BCA 3A", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80"),
+            ("Rohan Gupta", "rohan@student.edu", "BCA23", "BCA 3A", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"),
+            ("Sneha Reddy", "sneha@student.edu", "BCA24", "BCA 3A", "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80"),
+            ("Amit Singh", "amit@student.edu", "BCA25", "BCA 3A", "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80"),
+            ("Pooja Joshi", "pooja@student.edu", "BCA31", "BCA 3B", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"),
+            ("Vikas Nair", "vikas@student.edu", "BCA32", "BCA 3B", "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80"),
         ]
 
         student_user_objects = []
-        for name, email, roll, _ in students_raw:
+        for name, email, roll, _, photo in students_raw:
             stu_u = User(
                 name=name,
                 email=email,
                 role="student",
+                photo_url=photo,
                 active=True
             )
             stu_u.set_password("student123")
@@ -219,7 +223,7 @@ def seed_database():
                 old_status="absent",
                 new_status="present",
                 reason="Teacher marked wrong row by mistake, student was present",
-                corrected_at=datetime.utcnow() - timedelta(days=1)
+                corrected_at=datetime.now() - timedelta(days=1)
             )
             sample_att.status = "present"
             sample_att.locked = True

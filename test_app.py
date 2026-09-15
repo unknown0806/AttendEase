@@ -9,7 +9,7 @@ from models import (
 )
 from seed import seed_database
 
-class AttendEaseTestCase(unittest.TestCase):
+class AttendXTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.app.config['TESTING'] = True
@@ -26,12 +26,12 @@ class AttendEaseTestCase(unittest.TestCase):
             'password': 'teacher123'
         }, follow_redirects=True)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn(b'Hello, Suresh Kumar', resp.data)
+        self.assertIn(b'Suresh Kumar', resp.data)
 
         # Logout
         resp_logout = self.client.get('/logout', follow_redirects=True)
         self.assertEqual(resp_logout.status_code, 200)
-        self.assertIn(b'Welcome to AttendEase', resp_logout.data)
+        self.assertIn(b'Login', resp_logout.data)
 
     def test_invalid_login(self):
         resp = self.client.post('/login', data={
@@ -94,13 +94,37 @@ class AttendEaseTestCase(unittest.TestCase):
         resp = self.client.post('/login', data={'email': 'rahul@student.edu', 'password': 'student123'}, follow_redirects=True)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(b'Rahul Sharma', resp.data)
-        # Verify Python has alert (< 75%)
-        self.assertIn(b'Below 75%', resp.data)
-        self.assertIn(b'Attendance Shortage Warning', resp.data)
+        self.assertIn(b'Attendance Overview', resp.data)
+        # Check that shortage alert is rendered with needed classes
+        self.assertIn(b'Attendance Shortage', resp.data)
+        self.assertIn(b'You must attend the next', resp.data)
 
-    # ----------------------------------------------------
-    # 4. Admin Management & Audited Correction Tests
-    # ----------------------------------------------------
+        # Check attendance page
+        att_page = self.client.get('/student/attendance')
+        self.assertEqual(att_page.status_code, 200)
+        self.assertIn(b'Shortage Alert', att_page.data)
+        self.assertIn(b'Attend next', att_page.data)
+
+    def test_admin_photo_management(self):
+        # Login as Admin
+        self.client.post('/login', data={'email': 'priya@college.edu', 'password': 'admin123'})
+
+        # Update student photo via URL
+        with self.app.app_context():
+            stu = Student.query.first()
+            stu_id = stu.student_id
+
+        edit_res = self.client.post(f'/admin/students/{stu_id}/edit', data={
+            'name': 'Rahul Sharma Updated',
+            'roll_no': 'BCA21',
+            'class_id': 1,
+            'photo_url': 'https://example.com/custom_photo.jpg'
+        }, follow_redirects=True)
+        self.assertEqual(edit_res.status_code, 200)
+
+        with self.app.app_context():
+            updated_stu = Student.query.get(stu_id)
+            self.assertEqual(updated_stu.user.photo_url, 'https://example.com/custom_photo.jpg')
     def test_admin_mandatory_reason_correction_and_relock(self):
         # Login as Admin Priya
         self.client.post('/login', data={'email': 'priya@college.edu', 'password': 'admin123'})

@@ -1,144 +1,196 @@
 {% extends "base.html" %}
 
-{% block title %}Teacher Dashboard — AttendEase{% endblock %}
+{% block title %}Faculty Portal — Teacher Dashboard{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Welcome Header & Session Persistence Banner -->
+<div class="row g-3 py-2">
+    <!-- Top Header -->
     <div class="col-12">
-        <div class="card custom-card bg-primary text-white p-4 border-0 shadow-sm">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div class="app-top-header">
+            <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="fw-bold mb-1">Hello, {{ current_user.name }} 👋</h2>
-                    <p class="mb-0 text-white-50">Teacher Portal • Session Active (No re-login required across back-to-back classes)</p>
+                    <div class="small text-white-50 fw-semibold">Good Morning</div>
+                    <h3 class="fw-extrabold mb-0 text-white text-uppercase letter-spacing-1">Prof. {{ current_user.name }}</h3>
+                    <div class="small text-white-50 mt-1">
+                        <span class="badge bg-white bg-opacity-20 text-white me-1">Faculty</span>
+                        <span>Department of Computer Science &amp; Engineering</span>
+                    </div>
                 </div>
-                <div>
-                    <a href="{{ url_for('teacher.mark_attendance') }}" class="btn btn-light text-primary fw-semibold shadow-sm">
-                        <i class="bi bi-check2-square me-1"></i> Mark New Attendance
-                    </a>
+                {% if current_user.photo_url %}
+                    <img src="{{ current_user.photo_url }}" alt="{{ current_user.name }}" class="rounded-circle object-fit-cover border border-2 border-white shadow" style="width: 52px; height: 52px;">
+                {% else %}
+                    <div class="avatar-circle">
+                        <i class="bi bi-person-workspace"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards Row -->
+    <div class="col-12">
+        <div class="row g-2">
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-primary fs-3 mb-1"><i class="bi bi-mortarboard-fill"></i></div>
+                    <div class="text-muted small fw-bold">Assigned Classes</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ assignments|length }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-success fs-3 mb-1"><i class="bi bi-people-fill"></i></div>
+                    <div class="text-muted small fw-bold">Total Students</div>
+                    <div class="fs-4 fw-extrabold text-dark">{{ total_students_count }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-warning fs-3 mb-1"><i class="bi bi-check2-square"></i></div>
+                    <div class="text-muted small fw-bold">Attendance</div>
+                    <div class="fs-4 fw-extrabold text-dark">Active</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="app-card p-3 text-center mb-0">
+                    <div class="text-danger fs-3 mb-1"><i class="bi bi-shield-lock-fill"></i></div>
+                    <div class="text-muted small fw-bold">Lock Engine</div>
+                    <div class="fs-4 fw-extrabold text-success"><i class="bi bi-shield-check"></i> 100%</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Assigned Classes & Subjects -->
-    <div class="col-12 col-lg-7">
-        <div class="card custom-card p-4 h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0"><i class="bi bi-mortarboard text-primary me-2"></i>Assigned Classes & Subjects</h5>
-                <span class="badge bg-light text-dark border">{{ assignments|length }} Assigned</span>
-            </div>
+    <!-- Teacher Quick Actions Grid -->
+    <div class="col-12">
+        <div class="app-card">
+            <h6 class="fw-bold mb-4 text-secondary"><i class="bi bi-grid-fill text-primary me-2"></i>Academic Services</h6>
 
+            <div class="actions-grid">
+                <!-- 1. Take Attendance -->
+                <a href="{{ url_for('teacher.mark_attendance') }}" class="action-item">
+                    <div class="action-circle-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <span class="action-label">Take Attendance</span>
+                </a>
+
+                <!-- 2. My Classes -->
+                <a href="{{ url_for('teacher.my_classes') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    <span class="action-label">My Classes</span>
+                </a>
+
+                <!-- 3. Students Roster -->
+                <a href="{{ url_for('teacher.my_students') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-person-lines-fill"></i>
+                    </div>
+                    <span class="action-label">Students</span>
+                </a>
+
+                <!-- 4. Assignments -->
+                <a href="{{ url_for('teacher.assignments') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <span class="action-label">Assignments</span>
+                </a>
+
+                <!-- 5. Enter Marks -->
+                <a href="{{ url_for('teacher.marks') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-pencil-square"></i>
+                    </div>
+                    <span class="action-label">Enter Marks</span>
+                </a>
+
+                <!-- 6. Timetable -->
+                <a href="{{ url_for('teacher.timetable') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-calendar-week-fill"></i>
+                    </div>
+                    <span class="action-label">Timetable</span>
+                </a>
+
+                <!-- 7. Notices -->
+                <a href="{{ url_for('teacher.notices') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-bell-fill"></i>
+                    </div>
+                    <span class="action-label">Notices</span>
+                </a>
+
+                <!-- 8. Messages -->
+                <a href="{{ url_for('teacher.messages') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-chat-dots-fill"></i>
+                    </div>
+                    <span class="action-label">Messages</span>
+                </a>
+
+                <!-- 9. Profile -->
+                <a href="{{ url_for('teacher.profile') }}" class="action-item">
+                    <div class="action-circle-btn">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <span class="action-label">Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Classes Summary -->
+    <div class="col-12 col-md-6">
+        <div class="app-card h-100">
+            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-book-half text-primary me-2"></i>Assigned Subject Sections</h6>
             {% if assignments %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Class</th>
-                                <th>Subject</th>
-                                <th class="text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for a in assignments %}
-                                <tr>
-                                    <td>
-                                        <span class="fw-semibold">{{ a.class_obj.class_name }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1">{{ a.subject.subject_name }}</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="{{ url_for('teacher.mark_attendance', class_id=a.class_id, subject_id=a.subject_id) }}" class="btn btn-sm btn-outline-primary fw-semibold">
-                                            <i class="bi bi-pen me-1"></i> Mark Attendance
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="list-group list-group-flush small">
+                    {% for a in assignments %}
+                        <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="fw-bold mb-0 text-dark">{{ a.class_obj.class_name }}</h6>
+                                <span class="badge bg-primary-subtle text-primary mt-1">{{ a.subject.subject_name }}</span>
+                            </div>
+                            <a href="{{ url_for('teacher.mark_attendance', class_id=a.class_id, subject_id=a.subject_id) }}" class="btn btn-sm btn-primary fw-bold px-3">
+                                <i class="bi bi-pen"></i> Mark
+                            </a>
+                        </div>
+                    {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-warning mb-0">
-                    <i class="bi bi-info-circle me-2"></i>You have no classes assigned yet. Please ask an Administrator to assign you to a subject and class.
-                </div>
+                <p class="text-muted small mb-0">No classes assigned yet.</p>
             {% endif %}
         </div>
     </div>
 
-    <!-- Quick Info / Workflow summary -->
-    <div class="col-12 col-lg-5">
-        <div class="card custom-card p-4 h-100">
-            <h5 class="fw-bold mb-3"><i class="bi bi-shield-lock text-success me-2"></i>Tamper-Proof Guarantee</h5>
-            <ul class="list-group list-group-flush small">
-                <li class="list-group-item d-flex align-items-start gap-2 px-0 py-2 border-0">
-                    <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                    <div>
-                        <strong>One-Click Submission & Locking:</strong> Once you submit attendance for a period, the record is immediately locked.
-                    </div>
-                </li>
-                <li class="list-group-item d-flex align-items-start gap-2 px-0 py-2 border-0">
-                    <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                    <div>
-                        <strong>Seamless Multi-Class Workflow:</strong> Session stays active so you can mark Period 1 for BCA 3A, then Period 2 for BCA 3B without re-logging in.
-                    </div>
-                </li>
-                <li class="list-group-item d-flex align-items-start gap-2 px-0 py-2 border-0">
-                    <i class="bi bi-check-circle-fill text-success mt-1"></i>
-                    <div>
-                        <strong>Admin Audit Protocol:</strong> Any genuine mistake after submit must be corrected by an Administrator with a mandatory logged reason.
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
     <!-- Recent Marked Sessions -->
-    <div class="col-12">
-        <div class="card custom-card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-secondary me-2"></i>Recently Submitted Sessions</h5>
-            </div>
-
+    <div class="col-12 col-md-6">
+        <div class="app-card h-100">
+            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-clock-history text-primary me-2"></i>Recent Attendance Submissions</h6>
             {% if recent_sessions %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Class</th>
-                                <th>Subject</th>
-                                <th>Period</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Total</th>
-                                <th>Lock Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for s in recent_sessions %}
-                                <tr>
-                                    <td>{{ s.date.strftime('%d %b %Y') }}</td>
-                                    <td><strong>{{ s.class_name }}</strong></td>
-                                    <td>{{ s.subject_name }}</td>
-                                    <td><span class="badge bg-light text-dark border">{{ s.period_name }}</span></td>
-                                    <td><span class="text-success fw-bold">{{ s.present_count }}</span></td>
-                                    <td><span class="text-danger fw-bold">{{ s.absent_count }}</span></td>
-                                    <td>{{ s.total_count }}</td>
-                                    <td>
-                                        {% if s.locked %}
-                                            <span class="lock-badge"><i class="bi bi-lock-fill text-danger me-1"></i>Locked</span>
-                                        {% else %}
-                                            <span class="badge bg-warning text-dark">Open</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="list-group list-group-flush small">
+                    {% for s in recent_sessions %}
+                        <div class="list-group-item px-0 py-2 border-bottom d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold text-dark">{{ s.class_name }} &bull; {{ s.subject_name }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ s.date.strftime('%d %b %Y') }} &bull; {{ s.period_name }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div>
+                                    <span class="text-success fw-bold">{{ s.present_count }}P</span> / <span class="text-danger fw-bold">{{ s.absent_count }}A</span>
+                                </div>
+                                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.68rem;">
+                                    <i class="bi bi-lock-fill text-danger"></i> Locked
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             {% else %}
-                <p class="text-muted mb-0 small">No attendance sessions marked yet.</p>
+                <p class="text-muted small mb-0">No recent submissions.</p>
             {% endif %}
         </div>
     </div>

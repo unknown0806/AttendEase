@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum('teacher', 'student', 'admin', name='user_roles'), nullable=False)
+    photo_url = db.Column(db.String(255), nullable=True)
     active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -31,6 +32,7 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'role': self.role,
+            'photo_url': self.photo_url,
             'active': self.active,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
@@ -135,6 +137,7 @@ class Student(db.Model):
             'roll_no': self.roll_no,
             'class_id': self.class_id,
             'class_name': self.class_obj.class_name if self.class_obj else None,
+            'photo_url': self.user.photo_url if self.user else None,
             'active': self.user.active if self.user else None
         }
 

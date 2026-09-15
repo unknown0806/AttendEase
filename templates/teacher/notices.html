@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Notices — Faculty Portal{% endblock %}
+
+{% block content %}
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('teacher.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <h4 class="fw-bold mb-0 text-white">Department Notices</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notices List -->
+    <div class="col-12">
+        <div class="app-card mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-danger">EXAM CELL</span>
+                <span class="text-muted small">21 Aug 2026</span>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">Attendance Cut-Off Deadline for Hall Tickets</h6>
+            <p class="text-muted small mb-0">All faculty members are requested to submit and lock all pending attendance sessions by Friday 5:00 PM for ERP automated shortage report generation.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

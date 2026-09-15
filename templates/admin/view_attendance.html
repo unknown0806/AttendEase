@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 
-{% block title %}View Attendance — Admin — AttendEase{% endblock %}
+{% block title %}Institutional Attendance — Admin Portal{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Header -->
-    <div class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <h3 class="fw-bold mb-1"><i class="bi bi-table text-primary me-2"></i>Institutional Attendance Records</h3>
-            <p class="text-muted mb-0 small">Grouped session logs with lock indicators and student-level audit inspection</p>
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-white">Institutional Attendance</h4>
+                        <span class="small text-white-50">Filter sessions &amp; inspect locked student records</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('admin.audit_log') }}" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3">
+                    <i class="bi bi-shield-check me-1"></i> Audit Trail
+                </a>
+            </div>
         </div>
-        <a href="{{ url_for('admin.audit_log') }}" class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-journal-text me-1"></i> View Correction Audit Log
-        </a>
     </div>
 
-    <!-- Filter Bar -->
+    <!-- Filter Card -->
     <div class="col-12">
-        <div class="card custom-card p-3">
-            <form method="GET" action="{{ url_for('admin.view_attendance') }}" class="row g-2 align-items-center">
-                <div class="col-12 col-md-3">
-                    <label class="form-label small fw-semibold mb-1">Class</label>
+        <div class="app-card p-3">
+            <form method="GET" action="{{ url_for('admin.view_attendance') }}" class="row g-2 align-items-end">
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-bold text-secondary mb-1">Class</label>
                     <select name="class_id" class="form-select form-select-sm">
                         <option value="">-- All Classes --</option>
                         {% for c in classes %}
@@ -28,8 +37,8 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-12 col-md-3">
-                    <label class="form-label small fw-semibold mb-1">Subject</label>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-bold text-secondary mb-1">Subject</label>
                     <select name="subject_id" class="form-select form-select-sm">
                         <option value="">-- All Subjects --</option>
                         {% for s in subjects %}
@@ -37,98 +46,50 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-12 col-md-2">
-                    <label class="form-label small fw-semibold mb-1">Teacher</label>
-                    <select name="teacher_id" class="form-select form-select-sm">
-                        <option value="">-- All Teachers --</option>
-                        {% for t in teachers %}
-                            <option value="{{ t.user_id }}" {% if selected_teacher_id == t.user_id %}selected{% endif %}>{{ t.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-12 col-md-2">
-                    <label class="form-label small fw-semibold mb-1">Date</label>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-bold text-secondary mb-1">Date</label>
                     <input type="date" name="date" class="form-control form-control-sm" value="{{ selected_date }}">
                 </div>
-                <div class="col-12 col-md-2 d-flex gap-1 align-self-end">
-                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                <div class="col-6 col-md-3">
+                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
                         <i class="bi bi-funnel"></i> Filter
                     </button>
-                    <a href="{{ url_for('admin.view_attendance') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Grouped Sessions Table -->
+    <!-- Sessions List -->
     <div class="col-12">
-        <div class="card custom-card p-4">
+        <div class="app-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="fw-bold mb-0">Session Records Directory</h5>
+                <h6 class="fw-bold text-secondary mb-0"><i class="bi bi-table text-primary me-2"></i>Attendance Sessions</h6>
                 <span class="badge bg-light text-dark border">{{ sessions|length }} Sessions</span>
             </div>
 
             {% if sessions %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Class & Subject</th>
-                                <th>Period</th>
-                                <th>Date</th>
-                                <th>Marked By</th>
-                                <th>Attendance Breakdown</th>
-                                <th>Lock Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for s in sessions %}
-                                <tr>
-                                    <td>
-                                        <div class="fw-bold">{{ s.class_name }}</div>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ s.subject_name }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-light text-dark border">{{ s.period_name }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="fw-semibold">{{ s.date.strftime('%d %b %Y') }}</span>
-                                    </td>
-                                    <td class="text-muted small">
-                                        <i class="bi bi-person me-1"></i>{{ s.marked_by_name or 'Faculty' }}
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
-                                                <i class="bi bi-check-lg me-1"></i>{{ s.present_count }} Present
-                                            </span>
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
-                                                <i class="bi bi-x-lg me-1"></i>{{ s.absent_count }} Absent
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if s.locked %}
-                                            <span class="lock-badge"><i class="bi bi-lock-fill text-danger me-1"></i>Locked</span>
-                                        {% else %}
-                                            <span class="badge bg-warning text-dark">Open</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="{{ url_for('admin.view_session_detail', class_id=s.class_id, subject_id=s.subject_id, period_id=s.period_id, date=s.date.strftime('%Y-%m-%d')) }}" class="btn btn-sm btn-outline-primary fw-semibold">
-                                            <i class="bi bi-eye me-1"></i> Inspect & Correct
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="list-group list-group-flush">
+                    {% for s in sessions %}
+                        <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold text-dark fs-6">{{ s.class_name }} &bull; {{ s.subject_name }}</div>
+                                <div class="text-muted small">
+                                    {{ s.date.strftime('%d %b %Y') }} &bull; {{ s.period_name }} &bull; Faculty: {{ s.marked_by_name or 'Faculty' }}
+                                </div>
+                                <div class="mt-1">
+                                    <span class="badge-success-subtle me-1">{{ s.present_count }} Present</span>
+                                    <span class="alert-badge-danger me-1">{{ s.absent_count }} Absent</span>
+                                    <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;"><i class="bi bi-lock-fill text-danger"></i> Locked</span>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('admin.view_session_detail', class_id=s.class_id, subject_id=s.subject_id, period_id=s.period_id, date=s.date.strftime('%Y-%m-%d')) }}" class="btn btn-outline-primary btn-sm fw-bold rounded-pill px-3">
+                                Inspect &amp; Correct <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-info mb-0">
-                    No attendance records match the selected filter criteria.
-                </div>
+                <div class="alert alert-info mb-0">No attendance sessions found matching criteria.</div>
             {% endif %}
         </div>
     </div>

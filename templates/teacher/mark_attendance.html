@@ -1,17 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}Mark Attendance — AttendEase{% endblock %}
+{% block title %}Mark Attendance — Faculty Portal{% endblock %}
 
 {% block content %}
-<div class="row g-4">
-    <!-- Session Selection Form Header -->
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
     <div class="col-12">
-        <div class="card custom-card p-4">
-            <h5 class="fw-bold mb-3"><i class="bi bi-funnel text-primary me-2"></i>Select Class & Session</h5>
-            <form method="GET" action="{{ url_for('teacher.mark_attendance') }}" class="row g-3 align-items-end">
-                <div class="col-12 col-md-3">
-                    <label class="form-label fw-semibold small">Class & Subject</label>
-                    <select name="class_subject" class="form-select" onchange="const [cid, sid] = this.value.split(':'); window.location='{{ url_for('teacher.mark_attendance') }}?class_id=' + cid + '&subject_id=' + sid + '&period_id={{ selected_period_id }}&date={{ selected_date }}';">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('teacher.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <div>
+                    <h4 class="fw-bold mb-0 text-white">Take Attendance</h4>
+                    <span class="small text-white-50">Mark session &amp; submit to lock</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Selection Form -->
+    <div class="col-12">
+        <div class="app-card p-3">
+            <form method="GET" action="{{ url_for('teacher.mark_attendance') }}" class="row g-2 align-items-end">
+                <div class="col-12 col-md-4">
+                    <label class="form-label small fw-bold text-secondary mb-1">Class & Subject</label>
+                    <select name="class_subject" class="form-select form-select-sm" onchange="const [cid, sid] = this.value.split(':'); window.location='{{ url_for('teacher.mark_attendance') }}?class_id=' + cid + '&subject_id=' + sid + '&period_id={{ selected_period_id }}&date={{ selected_date }}';">
                         {% for a in assignments %}
                             <option value="{{ a.class_id }}:{{ a.subject_id }}" {% if a.class_id == selected_class.class_id and a.subject_id == selected_subject.subject_id %}selected{% endif %}>
                                 {{ a.class_obj.class_name }} — {{ a.subject.subject_name }}
@@ -20,9 +34,9 @@
                     </select>
                 </div>
 
-                <div class="col-12 col-md-3">
-                    <label class="form-label fw-semibold small">Period / Time Slot</label>
-                    <select name="period_id" class="form-select" onchange="window.location='{{ url_for('teacher.mark_attendance') }}?class_id={{ selected_class.class_id }}&subject_id={{ selected_subject.subject_id }}&period_id=' + this.value + '&date={{ selected_date }}';">
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-bold text-secondary mb-1">Period Slot</label>
+                    <select name="period_id" class="form-select form-select-sm" onchange="window.location='{{ url_for('teacher.mark_attendance') }}?class_id={{ selected_class.class_id }}&subject_id={{ selected_subject.subject_id }}&period_id=' + this.value + '&date={{ selected_date }}';">
                         {% for p in periods %}
                             <option value="{{ p.period_id }}" {% if p.period_id == selected_period_id %}selected{% endif %}>
                                 {{ p.period_name }}
@@ -31,13 +45,13 @@
                     </select>
                 </div>
 
-                <div class="col-12 col-md-3">
-                    <label class="form-label fw-semibold small">Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ selected_date }}" onchange="window.location='{{ url_for('teacher.mark_attendance') }}?class_id={{ selected_class.class_id }}&subject_id={{ selected_subject.subject_id }}&period_id={{ selected_period_id }}&date=' + this.value;">
+                <div class="col-6 col-md-3">
+                    <label class="form-label small fw-bold text-secondary mb-1">Date</label>
+                    <input type="date" name="date" class="form-control form-control-sm" value="{{ selected_date }}" onchange="window.location='{{ url_for('teacher.mark_attendance') }}?class_id={{ selected_class.class_id }}&subject_id={{ selected_subject.subject_id }}&period_id={{ selected_period_id }}&date=' + this.value;">
                 </div>
 
-                <div class="col-12 col-md-3 text-md-end">
-                    <span class="badge bg-light text-secondary border px-3 py-2">
+                <div class="col-12 col-md-2 text-md-end">
+                    <span class="badge bg-primary px-3 py-2 w-100">
                         <i class="bi bi-calendar-event me-1"></i> {{ selected_date }}
                     </span>
                 </div>
@@ -48,12 +62,12 @@
     {% if is_already_locked %}
         <!-- Locked Session Alert -->
         <div class="col-12">
-            <div class="alert alert-warning d-flex align-items-center justify-content-between p-3 shadow-sm border-warning">
+            <div class="alert alert-warning d-flex align-items-center justify-content-between p-3 rounded-4 shadow-sm border-warning">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-lock-fill fs-4 text-warning"></i>
+                    <i class="bi bi-lock-fill fs-3 text-warning"></i>
                     <div>
-                        <strong>This session is already submitted and LOCKED!</strong>
-                        <div class="small text-muted">Tamper-proof protection active: Teachers cannot modify submitted records. Contact an Admin for audited corrections.</div>
+                        <strong class="d-block">This session is already submitted and LOCKED!</strong>
+                        <span class="small text-muted">Attendance records are tamper-proof once submitted. Contact Administrator for audited corrections.</span>
                     </div>
                 </div>
                 <span class="badge bg-secondary">Read-Only</span>
@@ -61,43 +75,36 @@
         </div>
     {% endif %}
 
-    <!-- Student Attendance Sheet -->
+    <!-- Student Attendance Form & List -->
     <div class="col-12">
-        <div class="card custom-card p-4">
+        <div class="app-card">
             <form id="attendance-form" method="POST" action="{{ url_for('teacher.submit_attendance') }}">
                 <input type="hidden" name="class_id" value="{{ selected_class.class_id }}">
                 <input type="hidden" name="subject_id" value="{{ selected_subject.subject_id }}">
                 <input type="hidden" name="period_id" value="{{ selected_period_id }}">
                 <input type="hidden" name="date" value="{{ selected_date }}">
 
-                <!-- Action Bar & Live Counters -->
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom">
+                <!-- Header Bar with Live Counters & All Present/Absent buttons -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-3 border-bottom">
                     <div>
-                        <h4 class="fw-bold mb-0">
-                            {{ selected_class.class_name }} &bull; {{ selected_subject.subject_name }}
-                        </h4>
-                        <span class="text-muted small">Mark attendance for each student below</span>
+                        <h5 class="fw-bold mb-0 text-dark">{{ selected_class.class_name }} &bull; {{ selected_subject.subject_name }}</h5>
+                        <span class="text-muted small">Mark student attendance below</span>
                     </div>
 
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="d-flex gap-2">
-                            <span class="badge bg-light text-dark border py-2 px-3">
-                                Total: <strong id="count-total">{{ students|length }}</strong>
-                            </span>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle py-2 px-3">
-                                Present: <strong id="count-present">0</strong>
-                            </span>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-2 px-3">
-                                Absent: <strong id="count-absent">0</strong>
-                            </span>
-                        </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                            Present: <strong id="count-present">0</strong>
+                        </span>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2">
+                            Absent: <strong id="count-absent">0</strong>
+                        </span>
 
                         {% if not is_already_locked %}
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-outline-success btn-sm" onclick="markAll('present')">
+                            <div class="btn-group ms-auto">
+                                <button type="button" class="btn btn-outline-success btn-sm fw-bold" onclick="markAll('present')">
                                     <i class="bi bi-check-all"></i> All Present
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="markAll('absent')">
+                                <button type="button" class="btn btn-outline-danger btn-sm fw-bold" onclick="markAll('absent')">
                                     <i class="bi bi-x"></i> All Absent
                                 </button>
                             </div>
@@ -105,69 +112,59 @@
                     </div>
                 </div>
 
-                <!-- Students Table -->
+                <!-- Students Roster -->
                 {% if students %}
-                    <div class="table-responsive mb-4">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="width: 15%;">Roll No</th>
-                                    <th style="width: 45%;">Student Name</th>
-                                    <th style="width: 40%;" class="text-center">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for stu in students %}
-                                    {% set current_status = existing_status_map.get(stu.student_id, 'present') %}
-                                    <tr>
-                                        <td>
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2 py-1">
+                    <div class="list-group list-group-flush mb-4">
+                        {% for stu in students %}
+                            {% set current_status = existing_status_map.get(stu.student_id, 'present') %}
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-3">
+                                    {% if stu.user.photo_url %}
+                                        <img src="{{ stu.user.photo_url }}" alt="{{ stu.user.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;">
+                                    {% else %}
+                                        <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 42px; height: 42px; font-size: 0.85rem;">
+                                            {{ stu.user.name[:2]|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2 py-0.5" style="font-size: 0.72rem;">
                                                 {{ stu.roll_no }}
                                             </span>
-                                        </td>
-                                        <td>
-                                            <span class="fw-semibold">{{ stu.user.name }}</span>
-                                            <div class="text-muted small">{{ stu.user.email }}</div>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="btn-group" role="group" aria-label="Status for {{ stu.user.name }}">
-                                                <input type="radio" class="btn-check" name="status_{{ stu.student_id }}" id="present_{{ stu.student_id }}" value="present" {% if current_status == 'present' %}checked{% endif %} {% if is_already_locked %}disabled{% endif %}>
-                                                <label class="btn btn-outline-success btn-sm px-3" for="present_{{ stu.student_id }}">
-                                                    <i class="bi bi-check-lg me-1"></i> Present
-                                                </label>
+                                            <div class="fw-bold text-dark">{{ stu.user.name }}</div>
+                                        </div>
+                                        <div class="text-muted small" style="font-size: 0.72rem;">{{ stu.user.email }}</div>
+                                    </div>
+                                </div>
 
-                                                <input type="radio" class="btn-check" name="status_{{ stu.student_id }}" id="absent_{{ stu.student_id }}" value="absent" {% if current_status == 'absent' %}checked{% endif %} {% if is_already_locked %}disabled{% endif %}>
-                                                <label class="btn btn-outline-danger btn-sm px-3" for="absent_{{ stu.student_id }}">
-                                                    <i class="bi bi-x-lg me-1"></i> Absent
-                                                </label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="status_{{ stu.student_id }}" id="present_{{ stu.student_id }}" value="present" {% if current_status == 'present' %}checked{% endif %} {% if is_already_locked %}disabled{% endif %}>
+                                    <label class="btn btn-outline-success btn-sm px-3 fw-bold" for="present_{{ stu.student_id }}">
+                                        <i class="bi bi-check-lg"></i> Present
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="status_{{ stu.student_id }}" id="absent_{{ stu.student_id }}" value="absent" {% if current_status == 'absent' %}checked{% endif %} {% if is_already_locked %}disabled{% endif %}>
+                                    <label class="btn btn-outline-danger btn-sm px-3 fw-bold" for="absent_{{ stu.student_id }}">
+                                        <i class="bi bi-x-lg"></i> Absent
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
 
                     {% if not is_already_locked %}
-                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3 border">
+                        <div class="p-3 bg-light rounded-4 border d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                             <div class="small text-muted">
-                                <i class="bi bi-shield-exclamation text-danger me-1"></i>
-                                Clicking submit will <strong>lock</strong> these records immediately.
+                                <i class="bi bi-shield-lock-fill text-danger me-1"></i>
+                                Clicking submit will <strong>lock</strong> these records permanently.
                             </div>
-                            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold">
-                                <i class="bi bi-lock-fill me-1"></i> Submit & Lock Attendance
+                            <button type="submit" class="btn btn-primary px-4 py-2 fw-bold rounded-pill">
+                                <i class="bi bi-lock-fill me-1"></i> Submit &amp; Lock Attendance
                             </button>
                         </div>
-                    {% else %}
-                        <div class="text-center py-2 text-muted small">
-                            <i class="bi bi-lock-fill me-1"></i> Locked record — Submission disabled for teachers.
-                        </div>
                     {% endif %}
-
                 {% else %}
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle me-2"></i>No active students found in this class.
-                    </div>
+                    <div class="alert alert-info mb-0">No active students found in this class.</div>
                 {% endif %}
             </form>
         </div>

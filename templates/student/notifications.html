@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications — Student Diary Club{% endblock %}
+
+{% block content %}
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('student.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <h4 class="fw-bold mb-0 text-white">Alerts & Notifications</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="col-12">
+        <div class="app-card">
+            <div class="list-group list-group-flush small">
+                {% if overall_alert %}
+                    <div class="list-group-item px-0 py-3 border-bottom d-flex align-items-start gap-3 bg-danger bg-opacity-10 rounded-3 p-2 mb-2">
+                        <i class="bi bi-exclamation-octagon-fill fs-4 text-danger mt-1"></i>
+                        <div>
+                            <div class="fw-bold text-danger">ATTENDANCE SHORTAGE ALERT (< 75%)</div>
+                            <div class="text-dark">Your aggregate attendance is at {{ overall_pct }}%. Immediate action required before mid-term exams.</div>
+                            <div class="text-muted" style="font-size: 0.72rem;">Today &bull; ERP Automated Compliance Service</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="list-group-item px-0 py-3 border-bottom d-flex align-items-start gap-3">
+                    <i class="bi bi-bell-fill fs-4 text-primary mt-1"></i>
+                    <div>
+                        <div class="fw-bold text-dark">DBMS Attendance Submitted</div>
+                        <div class="text-muted">Attendance for Period 1 has been submitted and locked by Prof. Suresh Kumar.</div>
+                        <div class="text-muted" style="font-size: 0.72rem;">Yesterday &bull; Attendance Engine</div>
+                    </div>
+                </div>
+
+                <div class="list-group-item px-0 py-3 d-flex align-items-start gap-3">
+                    <i class="bi bi-megaphone-fill fs-4 text-success mt-1"></i>
+                    <div>
+                        <div class="fw-bold text-dark">अभिव्यंजना Cultural Event Registrations Open</div>
+                        <div class="text-muted">Register for poetry, dance, and drama performances on the Student Club portal.</div>
+                        <div class="text-muted" style="font-size: 0.72rem;">2 days ago &bull; Cultural Committee</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

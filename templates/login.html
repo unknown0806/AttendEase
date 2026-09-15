@@ -1,59 +1,82 @@
 {% extends "base.html" %}
 
-{% block title %}Login — AttendEase{% endblock %}
+{% set hide_header = true %}
+{% set hide_bottom_nav = true %}
+
+{% block title %}Login — Student Diary Club / AttendX{% endblock %}
+
+{% block body_class %}login-screen-bg{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center py-4">
-    <div class="col-12 col-md-8 col-lg-5">
-        <div class="card custom-card p-4 shadow-sm border-0">
-            <div class="text-center mb-4">
-                <div class="d-inline-flex p-3 bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
-                    <i class="bi bi-shield-lock fs-2"></i>
-                </div>
-                <h3 class="fw-bold mb-1">Welcome to AttendEase</h3>
-                <p class="text-muted small">Sign in to your role-based attendance portal</p>
+<div class="d-flex flex-column justify-content-between min-vh-100 py-3">
+    <!-- Top Branding Header (Screen 1) -->
+    <div class="login-brand-header">
+        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+            <i class="bi bi-cloud-check-fill app-icon"></i>
+            <h2 class="fw-bold mb-0 text-white tracking-tight">Student Diary Club</h2>
+        </div>
+        <p class="text-white-50 small mb-0">Indore Institute of Science & Technology &bull; ERP Portal</p>
+    </div>
+
+    <!-- Student Mascot / Illustration Area -->
+    <div class="text-center my-3">
+        <div class="d-inline-flex p-4 rounded-circle bg-white bg-opacity-10 border border-white border-opacity-25 shadow-sm text-white">
+            <i class="bi bi-people-fill fs-1 text-info"></i>
+        </div>
+    </div>
+
+    <!-- White Login Card Sliding from Bottom (Screen 1) -->
+    <div class="login-card">
+        <h3 class="login-title">- Login</h3>
+
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            <!-- User Name Input -->
+            <div class="custom-input-group">
+                <label for="email" class="form-label small fw-semibold text-secondary mb-1">User Name / Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="Enter student / faculty ID" autofocus>
+                <span class="input-icon"><i class="bi bi-person-fill"></i></span>
             </div>
 
-            <form action="{{ url_for('auth.login') }}" method="POST">
-                <div class="mb-3">
-                    <label for="email" class="form-label fw-semibold">Email Address</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="name@college.edu" autofocus>
-                    </div>
-                </div>
+            <!-- Password Input -->
+            <div class="custom-input-group">
+                <label for="password" class="form-label small fw-semibold text-secondary mb-1">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
+                <span class="input-icon" id="togglePassword" style="cursor: pointer; pointer-events: auto;"><i class="bi bi-eye-fill"></i></span>
+            </div>
 
-                <div class="mb-4">
-                    <label for="password" class="form-label fw-semibold">Password</label>
-                    <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
-                        <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
-                    </div>
+            <!-- Remember Me & Forgot Password -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe" name="remember_me" checked>
+                    <label class="form-check-label small text-secondary fw-semibold" for="rememberMe">
+                        Remember me
+                    </label>
                 </div>
+                <a href="javascript:void(0)" onclick="alert('Demo Mode: For test password recovery, use the Quick-Fill buttons below.');" class="small text-decoration-none text-secondary fw-semibold">
+                    Forgot Password?
+                </a>
+            </div>
 
-                <div class="d-grid mb-3">
-                    <button type="submit" class="btn btn-primary py-2 fw-semibold">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
-                    </button>
-                </div>
-            </form>
+            <!-- Prominent Login Button with Arrow -->
+            <button type="submit" class="btn btn-login-prominent w-100 py-3 mb-3">
+                <span>Login</span>
+                <i class="bi bi-arrow-right-circle fs-5"></i>
+            </button>
+        </form>
 
-            <hr class="my-4 text-muted">
-
-            <!-- Demo Quick-Fill Buttons -->
-            <div>
-                <p class="text-muted small fw-semibold text-center mb-2">⚡ Quick-Fill Demo Credentials</p>
-                <div class="d-flex flex-wrap gap-2 justify-content-center">
-                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="quickLogin('priya@college.edu', 'admin123')">
-                        <i class="bi bi-shield-check"></i> Admin (Priya)
-                    </button>
-                    <button type="button" class="btn btn-outline-success btn-sm" onclick="quickLogin('suresh@college.edu', 'teacher123')">
-                        <i class="bi bi-person-workspace"></i> Teacher (Suresh)
-                    </button>
-                    <button type="button" class="btn btn-outline-info btn-sm" onclick="quickLogin('rahul@student.edu', 'student123')">
-                        <i class="bi bi-mortarboard"></i> Student (Rahul)
-                    </button>
-                </div>
+        <!-- Quick-Fill Demo Pills -->
+        <div class="pt-3 border-top mt-2">
+            <div class="text-center text-muted small fw-bold mb-2">⚡ QUICK DEMO LOGINS</div>
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold" onclick="quickLogin('rahul@student.edu', 'student123')">
+                    <i class="bi bi-mortarboard-fill"></i> Student (Rahul)
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="quickLogin('suresh@college.edu', 'teacher123')">
+                    <i class="bi bi-person-workspace"></i> Teacher (Suresh)
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold" onclick="quickLogin('priya@college.edu', 'admin123')">
+                    <i class="bi bi-shield-lock-fill"></i> Admin (Priya)
+                </button>
             </div>
         </div>
     </div>

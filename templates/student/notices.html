@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Notices & Circulars — Student Diary Club{% endblock %}
+
+{% block content %}
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('student.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <h4 class="fw-bold mb-0 text-white">Campus Notices</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notices List -->
+    <div class="col-12">
+        <div class="app-card mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-danger">IMPORTANT</span>
+                <span class="text-muted small">21 Aug 2026</span>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">Mandatory 75% Attendance Requirement for End-Sem Exam</h6>
+            <p class="text-muted small mb-0">Students with less than 75% aggregate or subject attendance will be detained from appearing in upcoming university practical & theory examinations.</p>
+        </div>
+
+        <div class="app-card mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-primary">EVENT</span>
+                <span class="text-muted small">18 Aug 2026</span>
+            </div>
+            <h6 class="fw-bold text-dark mb-1">अभिव्यंजना Club Cultural & Poetry Festival</h6>
+            <p class="text-muted small mb-0">Auditions for open mic, debate, and music ensemble start this Wednesday at 3:00 PM in Central Auditorium.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

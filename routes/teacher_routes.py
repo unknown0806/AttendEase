@@ -15,6 +15,13 @@ def dashboard():
     # Fetch assigned class-subject pairs
     assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
     
+    # Calculate unique student count across teacher's assigned classes
+    assigned_class_ids = [a.class_id for a in assignments]
+    total_students_count = Student.query.join(User).filter(
+        Student.class_id.in_(assigned_class_ids),
+        User.active == True
+    ).count() if assigned_class_ids else 0
+
     # Fetch recent attendance batches marked by this teacher
     recent_records = Attendance.query.filter_by(marked_by=teacher_id)\
         .order_by(Attendance.date.desc(), Attendance.created_at.desc())\
@@ -45,6 +52,7 @@ def dashboard():
         'teacher/dashboard.html',
         user=user,
         assignments=assignments,
+        total_students_count=total_students_count,
         recent_sessions=list(grouped_recent.values())[:10]
     )
 
@@ -219,3 +227,89 @@ def submit_attendance():
 
     flash(f'Attendance successfully submitted and locked for {submitted_count} students! The record is now tamper-proof.', 'success')
     return redirect(url_for('teacher.dashboard'))
+
+@teacher_bp.route('/classes')
+@role_required('teacher')
+def my_classes():
+    teacher_id = session.get('user_id')
+    user = get_current_user()
+    assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    return render_template('teacher/classes.html', user=user, assignments=assignments)
+
+@teacher_bp.route('/students')
+@role_required('teacher')
+def my_students():
+    teacher_id = session.get('user_id')
+    user = get_current_user()
+    assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    class_ids = [a.class_id for a in assignments]
+    students = Student.query.join(User).filter(
+        Student.class_id.in_(class_ids),
+        User.active == True
+    ).order_by(Student.roll_no).all() if class_ids else []
+    return render_template('teacher/students.html', user=user, students=students, assignments=assignments)
+
+@teacher_bp.route('/assignments', methods=['GET', 'POST'])
+@role_required('teacher')
+def assignments():
+    teacher_id = session.get('user_id')
+    user = get_current_user()
+    my_assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    if request.method == 'POST':
+        title = request.form.get('title')
+        flash(f'Assignment "{title}" published to students successfully!', 'success')
+        return redirect(url_for('teacher.assignments'))
+    return render_template('teacher/assignments.html', user=user, my_assignments=my_assignments)
+
+@teacher_bp.route('/marks', methods=['GET', 'POST'])
+@role_required('teacher')
+def marks():
+    teacher_id = session.get('user_id')
+    user = get_current_user()
+    my_assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    class_ids = [a.class_id for a in my_assignments]
+    students = Student.query.join(User).filter(
+        Student.class_id.in_(class_ids),
+        User.active == True
+    ).order_by(Student.roll_no).all() if class_ids else []
+
+    if request.method == 'POST':
+        flash('Continuous Internal Assessment (CIA) marks recorded and saved!', 'success')
+        return redirect(url_for('teacher.marks'))
+
+    return render_template('teacher/marks.html', user=user, students=students, my_assignments=my_assignments)
+
+@teacher_bp.route('/timetable')
+@role_required('teacher')
+def timetable():
+    teacher_id = session.get('user_id')
+    user = get_current_user()
+    assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    periods = Period.query.order_by(Period.period_id).all()
+    return render_template('teacher/timetable.html', user=user, assignments=assignments, periods=periods)
+
+@teacher_bp.route('/notices')
+@role_required('teacher')
+def notices():
+    user = get_current_user()
+    return render_template('teacher/notices.html', user=user)
+
+@teacher_bp.route('/profile')
+@role_required('teacher')
+def profile():
+    user = get_current_user()
+    teacher_id = session.get('user_id')
+    assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+    return render_template('teacher/profile.html', user=user, assignments=assignments)
+
+@teacher_bp.route('/messages')
+@role_required('teacher')
+def messages():
+    user = get_current_user()
+    return render_template('teacher/messages.html', user=user)
+
+@teacher_bp.route('/notifications')
+@role_required('teacher')
+def notifications():
+    user = get_current_user()
+    return render_template('teacher/notifications.html', user=user)

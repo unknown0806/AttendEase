@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Institutional Reports — Admin Portal{% endblock %}
+
+{% block content %}
+<div class="row g-3 py-2">
+    <!-- Header with Back Button -->
+    <div class="col-12">
+        <div class="app-top-header">
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <div>
+                    <h4 class="fw-bold mb-0 text-white">Institutional Attendance Analytics</h4>
+                    <span class="small text-white-50">Shortage risk monitoring &amp; compliance reports</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shortage Risk Students Card -->
+    <div class="col-12">
+        <div class="app-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-danger mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Students Below 75% Threshold (Shortage List)</h6>
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ shortage_list|length }} At Risk</span>
+            </div>
+
+            {% if shortage_list %}
+                <div class="list-group list-group-flush">
+                    {% for item in shortage_list %}
+                        <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bold text-dark fs-6">{{ item.student.user.name }} ({{ item.student.roll_no }})</div>
+                                <div class="text-muted small">{{ item.student.class_obj.class_name }} &bull; {{ item.student.user.email }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-extrabold text-danger fs-5">{{ item.percentage }}%</div>
+                                <div class="text-muted small">{{ item.present }} / {{ item.total }} Classes</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted small mb-0">No students are currently below 75% aggregate attendance.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

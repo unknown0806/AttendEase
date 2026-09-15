@@ -232,6 +232,7 @@ def api_admin_get_students():
         'name': s.user.name,
         'roll_no': s.roll_no,
         'class_name': s.class_obj.class_name if s.class_obj else None,
+        'photo_url': s.user.photo_url,
         'active': s.user.active
     } for s in students]
 
@@ -246,6 +247,7 @@ def api_admin_add_student():
     password = data.get('password', 'temp123').strip()
     roll_no = data.get('roll_no', '').strip()
     class_id = data.get('class_id')
+    photo_url = data.get('photo_url')
 
     if not name or not email or not roll_no or not class_id:
         return jsonify({'error': 'name, email, roll_no, and class_id are required'}), 400
@@ -256,11 +258,11 @@ def api_admin_add_student():
     if Student.query.filter_by(roll_no=roll_no).first():
         return jsonify({'error': 'roll_no already exists'}), 409
 
-    target_class = Class.query.get(class_id)
+    target_class = db.session.get(Class, class_id)
     if not target_class:
         return jsonify({'error': 'class_id not found'}), 404
 
-    new_user = User(name=name, email=email, role='student', active=True)
+    new_user = User(name=name, email=email, role='student', photo_url=photo_url, active=True)
     new_user.set_password(password)
     db.session.add(new_user)
     db.session.flush()
@@ -274,7 +276,7 @@ def api_admin_add_student():
 @api_bp.route('/admin/students/<int:student_id>', methods=['PUT'])
 @role_required('admin')
 def api_admin_edit_student(student_id):
-    student = Student.query.get(student_id)
+    student = db.session.get(Student, student_id)
     if not student:
         return jsonify({'error': 'student not found'}), 404
 
@@ -282,9 +284,12 @@ def api_admin_edit_student(student_id):
     name = data.get('name')
     roll_no = data.get('roll_no')
     class_id = data.get('class_id')
+    photo_url = data.get('photo_url')
 
     if name is not None:
         student.user.name = name.strip()
+    if photo_url is not None:
+        student.user.photo_url = photo_url.strip()
     if roll_no is not None:
         roll_no = roll_no.strip()
         existing = Student.query.filter(Student.roll_no == roll_no, Student.student_id != student_id).first()
@@ -292,7 +297,7 @@ def api_admin_edit_student(student_id):
             return jsonify({'error': 'roll_no already exists'}), 409
         student.roll_no = roll_no
     if class_id is not None:
-        target_class = Class.query.get(class_id)
+        target_class = db.session.get(Class, class_id)
         if not target_class:
             return jsonify({'error': 'class_id not found'}), 404
         student.class_id = class_id
@@ -303,7 +308,7 @@ def api_admin_edit_student(student_id):
 @api_bp.route('/admin/students/<int:student_id>/deactivate', methods=['PATCH'])
 @role_required('admin')
 def api_admin_deactivate_student(student_id):
-    student = Student.query.get(student_id)
+    student = db.session.get(Student, student_id)
     if not student:
         return jsonify({'error': 'student not found'}), 404
 
@@ -329,6 +334,7 @@ def api_admin_get_teachers():
         'user_id': t.user_id,
         'name': t.name,
         'email': t.email,
+        'photo_url': t.photo_url,
         'active': t.active
     } for t in teachers]
 
@@ -341,6 +347,7 @@ def api_admin_add_teacher():
     name = data.get('name', '').strip()
     email = data.get('email', '').strip()
     password = data.get('password', 'temp123').strip()
+    photo_url = data.get('photo_url')
 
     if not name or not email:
         return jsonify({'error': 'name and email are required'}), 400
@@ -348,12 +355,12 @@ def api_admin_add_teacher():
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'email exists'}), 409
 
-    new_teacher = User(name=name, email=email, role='teacher', active=True)
+    new_teacher = User(name=name, email=email, role='teacher', photo_url=photo_url, active=True)
     new_teacher.set_password(password)
     db.session.add(new_teacher)
     db.session.commit()
 
-    return jsonify({'user_id': new_teacher.user_id, 'message': 'teacher added'}), 201
+    return jsonify({'user_id': new_teacher.user_id, 'teacher_id': new_teacher.user_id, 'message': 'teacher added'}), 201
 
 @api_bp.route('/admin/teachers/<int:teacher_id>', methods=['PUT'])
 @role_required('admin')
@@ -365,19 +372,21 @@ def api_admin_edit_teacher(teacher_id):
     data = request.get_json(silent=True) or {}
     name = data.get('name')
     email = data.get('email')
+    photo_url = data.get('photo_url')
 
     if name is not None:
         teacher.name = name.strip()
+    if photo_url is not None:
+        teacher.photo_url = photo_url.strip()
     if email is not None:
         email = email.strip()
         existing = User.query.filter(User.email == email, User.user_id != teacher_id).first()
         if existing:
-            return jsonify({'error': 'email exists'}), 409
+            return jsonify({'error': 'email already in use'}), 409
         teacher.email = email
 
     db.session.commit()
     return jsonify({'message': 'teacher updated'}), 200
-
 @api_bp.route('/admin/teachers/<int:teacher_id>/assign', methods=['POST'])
 @role_required('admin')
 def api_admin_assign_teacher(teacher_id):
