@@ -46,11 +46,11 @@
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         scene.add(ambientLight);
 
-        const pointLight1 = new THREE.PointLight(0x38bdf8, 1.2, 100);
+        const pointLight1 = new THREE.PointLight(0x38bdf8, 1.3, 100);
         pointLight1.position.set(20, 20, 20);
         scene.add(pointLight1);
 
-        const pointLight2 = new THREE.PointLight(0x184e96, 1.5, 100);
+        const pointLight2 = new THREE.PointLight(0x10b981, 1.4, 100);
         pointLight2.position.set(-20, -20, 15);
         scene.add(pointLight2);
 
@@ -66,7 +66,7 @@
 
         const meshMaterials = [
             new THREE.MeshStandardMaterial({
-                color: 0x184e96,
+                color: 0x3b82f6,
                 roughness: 0.3,
                 metalness: 0.2,
                 transparent: true,
@@ -74,20 +74,28 @@
                 wireframe: false
             }),
             new THREE.MeshStandardMaterial({
-                color: 0x0284c7,
+                color: 0x10b981,
                 roughness: 0.2,
                 metalness: 0.3,
                 transparent: true,
-                opacity: 0.18,
+                opacity: 0.20,
                 wireframe: true
             }),
             new THREE.MeshStandardMaterial({
-                color: 0x38bdf8,
+                color: 0x6366f1,
                 roughness: 0.4,
                 metalness: 0.1,
                 transparent: true,
-                opacity: 0.16,
+                opacity: 0.18,
                 wireframe: false
+            }),
+            new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                roughness: 0.3,
+                metalness: 0.2,
+                transparent: true,
+                opacity: 0.16,
+                wireframe: true
             })
         ];
 
@@ -129,9 +137,10 @@
 
         const colorPalette = [
             new THREE.Color(0x38bdf8), // Sky Blue
-            new THREE.Color(0x184e96), // Academic Deep Blue
-            new THREE.Color(0x818cf8), // Soft Indigo
-            new THREE.Color(0x06b6d4)  // Soft Cyan
+            new THREE.Color(0x3b82f6), // Electric Blue
+            new THREE.Color(0x10b981), // Emerald Green
+            new THREE.Color(0x34d399), // Mint Glow
+            new THREE.Color(0x6366f1)  // Indigo
         ];
 
         for (let i = 0; i < particleCount; i++) {

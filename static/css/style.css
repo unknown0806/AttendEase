@@ -1,14 +1,19 @@
 :root {
-    --app-primary: #184e96;
-    --app-primary-dark: #10376d;
-    --app-primary-light: #2563eb;
-    --app-primary-subtle: #ebf3ff;
+    --app-primary: #3b82f6;
+    --app-primary-dark: #0b0f19;
+    --app-primary-indigo: #4f46e5;
+    --app-primary-light: #60a5fa;
+    --app-primary-subtle: #eff6ff;
+    --app-emerald: #10b981;
+    --app-emerald-glow: #34d399;
+    --app-emerald-subtle: #ecfdf5;
+    --app-cyan: #06b6d4;
     --app-accent: #f59e0b;
     --app-success: #10b981;
     --app-danger: #ef4444;
-    --app-bg: #f3f6fa;
+    --app-bg: #f8fafc;
     --app-card: #ffffff;
-    --app-text: #1e293b;
+    --app-text: #0f172a;
     --app-text-muted: #64748b;
     --app-border: #e2e8f0;
     --app-radius: 18px;
@@ -40,15 +45,41 @@ body {
     }
 }
 
-/* Top App Header (Academic Deep Blue) */
+/* Desktop Navbar with Logo Match */
+.app-navbar {
+    background: #0b0f19 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+}
+
+.logo-glow {
+    filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.45));
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.logo-glow:hover {
+    filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.7));
+    transform: scale(1.05);
+}
+
+.text-emerald {
+    color: #10b981 !important;
+}
+
+.bg-emerald-subtle {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Top App Header (Obsidian Dark Navy with Glowing Electric/Emerald Gradient) */
 .app-top-header {
-    background: linear-gradient(135deg, var(--app-primary-dark) 0%, var(--app-primary) 100%);
+    background: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #1e1b4b 100%);
     color: #ffffff;
     padding: 20px 20px 30px 20px;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
-    box-shadow: 0 4px 20px rgba(16, 55, 109, 0.15);
+    box-shadow: 0 6px 24px rgba(11, 15, 25, 0.25);
     margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .app-top-header a {
@@ -161,20 +192,20 @@ body {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #184e96 0%, #10376d 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 50%, #10b981 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.4rem;
     margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(24, 78, 150, 0.28);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
     transition: all 0.2s ease;
 }
 
 .action-item:hover .action-circle-btn {
-    box-shadow: 0 6px 16px rgba(24, 78, 150, 0.4);
-    background: linear-gradient(135deg, #1f5eb5 0%, #184e96 100%);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.45);
+    background: linear-gradient(135deg, #60a5fa 0%, #6366f1 50%, #34d399 100%);
 }
 
 .action-label {
@@ -192,11 +223,11 @@ body {
     border: 1px solid var(--app-border);
     overflow: hidden;
     margin-bottom: 16px;
-    box-shadow: 0 3px 10px rgba(18, 56, 108, 0.05);
+    box-shadow: 0 3px 10px rgba(11, 15, 25, 0.05);
 }
 
 .subject-card-header {
-    background: linear-gradient(90deg, #10376d 0%, #184e96 100%);
+    background: linear-gradient(90deg, #0b0f19 0%, #1e1b4b 60%, #064e3b 100%);
     color: #ffffff;
     padding: 10px 16px;
     font-weight: 700;
@@ -247,8 +278,8 @@ body {
 
 /* Banner Announcement Card (Screen 2) */
 .announcement-banner {
-    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
-    border: 1px solid #bfdbfe;
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #eff6ff 100%);
+    border: 1px solid #bbf7d0;
     border-radius: var(--app-radius);
     padding: 14px 18px;
     margin-bottom: 16px;
@@ -257,24 +288,24 @@ body {
     gap: 14px;
 }
 
-/* Bottom Navigation Bar (Matching Reference Screens) */
+/* Bottom Navigation Bar */
 .mobile-bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: #10376d;
+    background: #0b0f19;
     height: 62px;
     display: flex;
     align-items: center;
     justify-content: space-around;
     z-index: 1050;
-    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.15);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .bottom-nav-item {
-    color: #94a3b8;
+    color: #64748b;
     text-decoration: none;
     display: flex;
     flex-direction: column;
@@ -283,12 +314,17 @@ body {
     font-size: 1.25rem;
     position: relative;
     padding: 6px 12px;
-    transition: color 0.15s ease;
+    transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .bottom-nav-item.active,
 .bottom-nav-item:hover {
-    color: #ffffff;
+    color: #38bdf8;
+    transform: translateY(-2px);
+}
+
+.bottom-nav-item.active i {
+    color: #10b981;
 }
 
 .bottom-nav-item .nav-badge {
@@ -305,12 +341,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #10376d;
+    border: 2px solid #0b0f19;
 }
 
-/* Login Screen Styles (Matching Reference Screen 1) */
+/* Login Screen Styles (Matching Logo Dark Theme) */
 .login-screen-bg {
-    background: linear-gradient(180deg, #144485 0%, #10376d 45%, #f3f6fa 45%, #f3f6fa 100%);
+    background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0b0f19 50%, #050811 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -320,20 +356,14 @@ body {
 .login-brand-header {
     text-align: center;
     color: #ffffff;
-    padding: 30px 20px 10px 20px;
-}
-
-.login-brand-header .app-icon {
-    font-size: 2.8rem;
-    color: #38bdf8;
-    margin-bottom: 6px;
+    padding: 24px 20px 10px 20px;
 }
 
 .login-card {
     background: #ffffff;
     border-top-left-radius: 36px;
     border-top-right-radius: 36px;
-    box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.35);
     padding: 36px 28px 28px 28px;
     width: 100%;
     max-width: 480px;
@@ -341,9 +371,9 @@ body {
 }
 
 .login-title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 800;
-    color: #184e96;
+    color: #0f172a;
     margin-bottom: 24px;
     letter-spacing: -0.5px;
 }
@@ -358,12 +388,12 @@ body {
     padding: 12px 42px 12px 16px;
     border: 1.5px solid #cbd5e1;
     font-size: 0.95rem;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .custom-input-group .form-control:focus {
-    border-color: var(--app-primary);
-    box-shadow: 0 0 0 3px rgba(24, 78, 150, 0.15);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .custom-input-group .input-icon {
@@ -377,14 +407,14 @@ body {
 }
 
 .btn-login-prominent {
-    background: linear-gradient(135deg, #184e96 0%, #10376d 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #4f46e5 50%, #10b981 100%);
     color: #ffffff;
     font-weight: 700;
     font-size: 1rem;
     border-radius: 12px;
     padding: 12px 24px;
     border: none;
-    box-shadow: 0 4px 14px rgba(24, 78, 150, 0.35);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
     transition: transform 0.15s, box-shadow 0.15s;
     display: flex;
     align-items: center;
@@ -394,7 +424,7 @@ body {
 
 .btn-login-prominent:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(24, 78, 150, 0.45);
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5);
     color: #ffffff;
 }
 

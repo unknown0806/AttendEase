@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <defs>
+    <linearGradient id="navCalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="40%" stop-color="#3b82f6"/>
+      <stop offset="75%" stop-color="#4f46e5"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+
+    <linearGradient id="navFaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+
+    <linearGradient id="navCheckGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <linearGradient id="xGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Calendar Icon Graphic (Left) -->
+  <g transform="translate(6, 6) scale(0.58)">
+    <rect x="15" y="22" width="90" height="84" rx="22" ry="22" fill="url(#navCalGrad)"/>
+    <rect x="22" y="38" width="76" height="61" rx="14" ry="14" fill="url(#navFaceGrad)" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+    <rect x="33" y="14" width="10" height="18" rx="5" ry="5" fill="#60a5fa" stroke="#1d4ed8" stroke-width="1.5"/>
+    <rect x="77" y="14" width="10" height="18" rx="5" ry="5" fill="#818cf8" stroke="#4338ca" stroke-width="1.5"/>
+    <rect x="31" y="48" width="14" height="11" rx="3.5" fill="#60a5fa" fill-opacity="0.4"/>
+    <rect x="53" y="48" width="14" height="11" rx="3.5" fill="#60a5fa" fill-opacity="0.4"/>
+    <rect x="75" y="48" width="14" height="11" rx="3.5" fill="#60a5fa" fill-opacity="0.4"/>
+    <rect x="31" y="67" width="14" height="11" rx="3.5" fill="#38bdf8" fill-opacity="0.4"/>
+    <rect x="53" y="67" width="14" height="11" rx="3.5" fill="#34d399" fill-opacity="0.4"/>
+    <circle cx="83" cy="77" r="18" fill="url(#navCheckGrad)" stroke="#0b0f19" stroke-width="3"/>
+    <path d="M76 77.5 L81 82.5 L90 72.5" fill="none" stroke="#064e3b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Typography: AttenX -->
+  <text x="82" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="900" fill="#ffffff" letter-spacing="-0.5">
+    Atten<tspan fill="url(#xGrad)">X</tspan>
+  </text>
+
+  <!-- Subtitle: ONLINE ATTENDANCE TRACKER -->
+  <text x="83" y="63" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="9.5" font-weight="700" fill="#94a3b8" letter-spacing="2.2">
+    ONLINE ATTENDANCE TRACKER
+  </text>
+</svg>

@@ -9,20 +9,12 @@
 
 {% block content %}
 <div class="d-flex flex-column justify-content-between min-vh-100 py-3">
-    <!-- Top Branding Header (Screen 1) -->
-    <div class="login-brand-header">
-        <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
-            <i class="bi bi-cloud-check-fill app-icon"></i>
-            <h2 class="fw-bold mb-0 text-white tracking-tight">AttendX</h2>
+    <!-- Top Branding & Official Logo Header -->
+    <div class="login-brand-header text-center my-auto">
+        <div class="mb-3">
+            <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="AttenX Online Attendance Tracker" class="logo-hero-img" style="width: 200px; height: auto; filter: drop-shadow(0 10px 25px rgba(59, 130, 246, 0.35));">
         </div>
-        <p class="text-white-50 small mb-0">Indore Institute of Science & Technology &bull; ERP Portal</p>
-    </div>
-
-    <!-- Student Mascot / Illustration Area -->
-    <div class="text-center my-3">
-        <div class="d-inline-flex p-4 rounded-circle bg-white bg-opacity-10 border border-white border-opacity-25 shadow-sm text-white">
-            <i class="bi bi-people-fill fs-1 text-info"></i>
-        </div>
+        <p class="text-white-50 small mb-0 tracking-wide">Indore Institute of Science & Technology &bull; ERP System</p>
     </div>
 
     <!-- White Login Card Sliding from Bottom (Screen 1) -->
