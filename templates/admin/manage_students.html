@@ -62,8 +62,16 @@
                 <span class="badge bg-light text-dark border">{{ students|length }} Enrolled</span>
             </div>
 
+            <!-- Instant Live Search Bar -->
+            <div class="mb-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="studentSearchInput" class="form-control border-start-0 ps-0" placeholder="Type student name, roll no, or email to search...">
+                </div>
+            </div>
+
             {% if students %}
-                <div class="list-group list-group-flush">
+                <div id="studentsList" class="list-group list-group-flush">
                     {% for stu in students %}
                         <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center gap-3">
@@ -232,4 +240,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.AttendXAnim) {
+            AttendXAnim.initTableSearch('studentSearchInput', '#studentsList .list-group-item');
+        }
+    });
+</script>
 {% endblock %}

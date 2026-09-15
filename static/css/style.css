@@ -397,3 +397,144 @@ body {
     box-shadow: 0 6px 18px rgba(24, 78, 150, 0.45);
     color: #ffffff;
 }
+
+/* ==========================================================================
+   Three.js Fixed Background Canvas
+   ========================================================================== */
+#three-bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.95;
+}
+
+/* ==========================================================================
+   GSAP Toast Notification System
+   ========================================================================== */
+.attendx-toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    max-width: 380px;
+    width: calc(100vw - 48px);
+}
+
+.attendx-toast {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 12px 32px rgba(16, 55, 109, 0.16);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    pointer-events: auto;
+    position: relative;
+    border-left: 5px solid var(--app-primary);
+}
+
+.attendx-toast.toast-success {
+    border-left-color: #10b981;
+}
+
+.attendx-toast.toast-danger {
+    border-left-color: #ef4444;
+}
+
+.attendx-toast.toast-warning {
+    border-left-color: #f59e0b;
+}
+
+.attendx-toast .toast-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.attendx-toast .toast-content {
+    flex-grow: 1;
+}
+
+.attendx-toast .toast-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.attendx-toast .toast-msg {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.35;
+}
+
+.attendx-toast .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0 4px;
+    transition: color 0.15s;
+}
+
+.attendx-toast .toast-close:hover {
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   Micro-Interactions & Hardware Acceleration
+   ========================================================================== */
+.app-card, .subject-card, .action-item, .btn {
+    will-change: transform;
+}
+
+.stat-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(24, 78, 150, 0.12);
+}
+
+/* ==========================================================================
+   Chart Containers
+   ========================================================================== */
+.chart-container-card {
+    position: relative;
+    width: 100%;
+    height: 220px;
+}
+
+@media (max-width: 576px) {
+    .chart-container-card {
+        height: 190px;
+    }
+}
+
+/* ==========================================================================
+   Skeleton Shimmer Loading State
+   ========================================================================== */
+.skeleton-shimmer {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+

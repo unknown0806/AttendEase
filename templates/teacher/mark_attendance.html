@@ -117,7 +117,7 @@
                     <div class="list-group list-group-flush mb-4">
                         {% for stu in students %}
                             {% set current_status = existing_status_map.get(stu.student_id, 'present') %}
-                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center" data-student-row>
                                 <div class="d-flex align-items-center gap-3">
                                     {% if stu.user.photo_url %}
                                         <img src="{{ stu.user.photo_url }}" alt="{{ stu.user.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 42px; height: 42px;">

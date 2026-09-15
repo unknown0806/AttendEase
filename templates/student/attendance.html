@@ -62,7 +62,7 @@
                     <!-- Left: Circular Gauge with Percentage & Subject Code -->
                     <div class="gauge-wrapper text-center pe-3">
                         <div class="gauge-circle" data-percent="{{ s.percentage }}">
-                            <span class="gauge-text">{{ s.percentage }}%</span>
+                            <span class="gauge-text" data-counter data-is-percent="true" data-target="{{ s.percentage }}">{{ s.percentage }}%</span>
                         </div>
                         <div class="fw-bold text-secondary small mt-1">{{ s.subject_code }}</div>
                     </div>

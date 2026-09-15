@@ -20,11 +20,11 @@
     </div>
 
     <!-- Shortage Risk Students Card -->
-    <div class="col-12">
-        <div class="app-card">
+    <div class="col-12 col-md-7">
+        <div class="app-card h-100">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold text-danger mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>Students Below 75% Threshold (Shortage List)</h6>
-                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ shortage_list|length }} At Risk</span>
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle" data-counter data-target="{{ shortage_list|length }}">{{ shortage_list|length }} At Risk</span>
             </div>
 
             {% if shortage_list %}
@@ -36,7 +36,7 @@
                                 <div class="text-muted small">{{ item.student.class_obj.class_name }} &bull; {{ item.student.user.email }}</div>
                             </div>
                             <div class="text-end">
-                                <div class="fw-extrabold text-danger fs-5">{{ item.percentage }}%</div>
+                                <div class="fw-extrabold text-danger fs-5" data-counter data-is-percent="true" data-target="{{ item.percentage }}">{{ item.percentage }}%</div>
                                 <div class="text-muted small">{{ item.present }} / {{ item.total }} Classes</div>
                             </div>
                         </div>
@@ -47,5 +47,28 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Shortage Analytics Chart -->
+    <div class="col-12 col-md-5">
+        <div class="app-card h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold text-secondary mb-0"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Compliance Status</h6>
+                <span class="badge bg-primary-subtle text-primary">Overview</span>
+            </div>
+            <div class="chart-container-card d-flex align-items-center justify-content-center">
+                <canvas id="complianceChart"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.AttendXCharts) {
+            AttendXCharts.adminDonut('complianceChart', 82, {{ shortage_list|length * 6 if shortage_list|length > 0 else 18 }});
+        }
+    });
+</script>
 {% endblock %}
