@@ -1,4 +1,11 @@
 import os
+import sys
+
+# Ensure the project root is always on sys.path (needed when Flask reloader re-spawns)
+_root = os.path.dirname(os.path.abspath(__file__))
+if _root not in sys.path:
+    sys.path.insert(0, _root)
+
 from flask import Flask, redirect, url_for, session
 from config import Config
 from db import db
@@ -10,6 +17,13 @@ def create_app(config_class=Config):
 
     # Initialize extensions
     db.init_app(app)
+
+    # Ensure database tables exist
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Notice during db.create_all: {e}")
 
     # Context processor to inject current_user and user_role into all Jinja2 templates
     @app.context_processor
@@ -50,7 +64,4 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
-
