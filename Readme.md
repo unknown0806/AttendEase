@@ -237,18 +237,39 @@ Open your browser and navigate to **`http://127.0.0.1:5000`**.
 
 ---
 
+## ⚡ Deploy to Vercel
+
+AttendX is fully configured for **1-click zero-config deployment on Vercel** via Serverless Python runtime (`@vercel/python`).
+
+### Deploy Steps:
+1. Fork or push this repository to GitHub: `https://github.com/unknown0806/AttendEase.git`.
+2. Go to [Vercel Dashboard](https://vercel.com/new) and click **"Add New Project"**.
+3. Import your `AttendEase` repository.
+4. *(Optional)* In **Environment Variables**, set:
+   - `SECRET_KEY`: A random secret string.
+   - `DATABASE_URL`: *(Optional)* If using external MySQL or PostgreSQL (e.g. Supabase, Neon, Aiven). If omitted, AttendX automatically runs the bundled SQLite database with pre-seeded demo users in `/tmp`!
+5. Click **"Deploy"**.
+
+Your full AttendX application with all role portals, Three.js 3D backgrounds, GSAP animations, and demo credentials will be live immediately!
+
+---
+
 ## 📁 Project Directory Structure
 
 ```
 attendx/
+├── api/
+│   └── index.py                # Vercel Serverless Function Entrypoint
 ├── app.py                      # Flask Application Factory & Route Registration
-├── config.py                   # Environment & Database Configuration (AttendX)
+├── config.py                   # Environment, Vercel /tmp DB & Database Config
+├── wsgi.py                     # WSGI Application Handler
+├── vercel.json                 # Vercel Serverless Deployment Configuration
 ├── db.py                       # SQLAlchemy Instance Initialization
-├── models.py                   # 9 Relational SQLAlchemy Database Models
+├── models.py                   # 10 Relational SQLAlchemy Database Models
 ├── auth.py                     # Session & Role-Based Access Control Decorators
-├── seed.py                     # Demo Data Seeder with Multi-Subject Attendance
-├── test_app.py                 # 8 Automated Unittest Suites
-├── requirements.txt            # Python Dependencies
+├── seed.py                     # Demo Data Seeder with Multi-Subject Attendance & Marks
+├── test_app.py                 # Automated Unittest Suite (9/9 Passing)
+├── requirements.txt            # Python Dependencies & Database Drivers
 ├── .env.example                # Sample Environment Template
 ├── routes/
 │   ├── auth_routes.py          # Login, Logout, Session Handlers

@@ -11,6 +11,13 @@ def create_app(config_class=Config):
     # Initialize extensions
     db.init_app(app)
 
+    # Ensure database tables exist
+    with app.app_context():
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning(f"Notice during db.create_all: {e}")
+
     # Context processor to inject current_user and user_role into all Jinja2 templates
     @app.context_processor
     def inject_user():
@@ -53,4 +60,5 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
-
+
+app = create_app()
