@@ -64,15 +64,20 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-3">
-                        <div class="text-white d-flex align-items-center gap-2">
-                            <div class="avatar-circle" style="width: 34px; height: 34px; font-size: 0.85rem;">
-                                {{ current_user.name[0] if current_user else 'U' }}
-                            </div>
-                            <span class="small fw-semibold">{{ current_user.name }}</span>
+                        <a href="{% if user_role == 'student' %}{{ url_for('student.profile') }}{% elif user_role == 'teacher' %}{{ url_for('teacher.profile') }}{% else %}{{ url_for('admin.profile') }}{% endif %}" class="text-white text-decoration-none d-flex align-items-center gap-2" title="View Profile">
+                            {% if current_user and current_user.photo_url %}
+                                <img src="{{ current_user.photo_url }}" alt="{{ current_user.name }}" class="rounded-circle object-fit-cover border border-1 border-white shadow-sm flex-shrink-0" style="width: 34px; height: 34px;">
+                            {% else %}
+                                <div class="avatar-circle flex-shrink-0" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                                    {{ current_user.name[0] if current_user else 'U' }}
+                                </div>
+                            {% endif %}
+                            <span class="small fw-semibold">{{ current_user.name if current_user else 'User' }}</span>
                             <span class="badge bg-primary text-uppercase" style="font-size: 0.65rem;">{{ user_role }}</span>
-                        </div>
-                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-light btn-sm rounded-pill px-3 d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span>Logout</span>
                         </a>
                     </div>
                 </div>

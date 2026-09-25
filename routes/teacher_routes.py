@@ -373,12 +373,63 @@ def notices():
     user = get_current_user()
     return render_template('teacher/notices.html', user=user)
 
-@teacher_bp.route('/profile')
+@teacher_bp.route('/profile', methods=['GET', 'POST'])
 @role_required('teacher')
 def profile():
     user = get_current_user()
     teacher_id = session.get('user_id')
     assignments = TeacherSubject.query.filter_by(teacher_id=teacher_id).all()
+
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone', '').strip()
+        address = request.form.get('address', '').strip()
+        department = request.form.get('department', '').strip()
+        designation = request.form.get('designation', '').strip()
+        qualification = request.form.get('qualification', '').strip()
+        photo_url_input = request.form.get('photo_url', '').strip()
+        photo_file = request.files.get('photo_file')
+
+        current_password = request.form.get('current_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        if not name:
+            flash('Name is required.', 'danger')
+            return redirect(url_for('teacher.profile'))
+
+        # Check password change
+        if new_password:
+            if not current_password or not user.check_password(current_password):
+                flash('Current password is required and must be correct to set a new password.', 'danger')
+                return redirect(url_for('teacher.profile'))
+            if new_password != confirm_password:
+                flash('New password and confirmation do not match.', 'danger')
+                return redirect(url_for('teacher.profile'))
+            if len(new_password) < 6:
+                flash('New password must be at least 6 characters long.', 'danger')
+                return redirect(url_for('teacher.profile'))
+            user.set_password(new_password)
+
+        from routes.admin_routes import save_avatar_file
+        saved_file = save_avatar_file(photo_file, prefix=f"faculty_{user.user_id}")
+        if saved_file:
+            user.photo_url = saved_file
+        elif photo_url_input:
+            user.photo_url = photo_url_input
+
+        user.name = name
+        user.phone = phone if phone else None
+        user.address = address if address else None
+        user.department = department if department else None
+        user.designation = designation if designation else None
+        user.qualification = qualification if qualification else None
+        db.session.commit()
+
+        session['user_name'] = user.name
+        flash('Faculty profile updated successfully!', 'success')
+        return redirect(url_for('teacher.profile'))
+
     return render_template('teacher/profile.html', user=user, assignments=assignments)
 
 @teacher_bp.route('/messages')

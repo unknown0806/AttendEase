@@ -1,4 +1,11 @@
 import os
+import sys
+
+# Ensure the project root is always on sys.path (needed when Flask reloader re-spawns)
+_root = os.path.dirname(os.path.abspath(__file__))
+if _root not in sys.path:
+    sys.path.insert(0, _root)
+
 from flask import Flask, redirect, url_for, session
 from config import Config
 from db import db
@@ -57,8 +64,5 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
 
-app = create_app()

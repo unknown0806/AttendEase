@@ -11,6 +11,11 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     role = db.Column(db.Enum('teacher', 'student', 'admin', name='user_roles'), nullable=False)
     photo_url = db.Column(db.String(255), nullable=True)
+    phone = db.Column(db.String(25), nullable=True)
+    address = db.Column(db.String(255), nullable=True)
+    department = db.Column(db.String(100), nullable=True)
+    designation = db.Column(db.String(100), nullable=True)
+    qualification = db.Column(db.String(100), nullable=True)
     active = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -33,6 +38,11 @@ class User(db.Model):
             'email': self.email,
             'role': self.role,
             'photo_url': self.photo_url,
+            'phone': self.phone,
+            'address': self.address,
+            'department': self.department,
+            'designation': self.designation,
+            'qualification': self.qualification,
             'active': self.active,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
@@ -124,7 +134,14 @@ class Student(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), unique=True, nullable=False)
     roll_no = db.Column(db.String(20), unique=True, nullable=False)
     class_id = db.Column(db.Integer, db.ForeignKey('classes.class_id'), nullable=False)
-
+    father_name = db.Column(db.String(100), nullable=True)
+    mother_name = db.Column(db.String(100), nullable=True)
+    father_phone = db.Column(db.String(25), nullable=True)
+    mother_phone = db.Column(db.String(25), nullable=True)
+    dob = db.Column(db.String(20), nullable=True)
+    gender = db.Column(db.String(10), nullable=True)
+    blood_group = db.Column(db.String(10), nullable=True)
+    
     # Relationships
     attendances = db.relationship('Attendance', backref='student', lazy=True)
 
@@ -134,9 +151,18 @@ class Student(db.Model):
             'user_id': self.user_id,
             'name': self.user.name if self.user else None,
             'email': self.user.email if self.user else None,
+            'phone': self.user.phone if self.user else None,
+            'address': self.user.address if self.user else None,
             'roll_no': self.roll_no,
             'class_id': self.class_id,
             'class_name': self.class_obj.class_name if self.class_obj else None,
+            'father_name': self.father_name,
+            'mother_name': self.mother_name,
+            'father_phone': self.father_phone,
+            'mother_phone': self.mother_phone,
+            'dob': self.dob,
+            'gender': self.gender,
+            'blood_group': self.blood_group,
             'photo_url': self.user.photo_url if self.user else None,
             'active': self.user.active if self.user else None
         }

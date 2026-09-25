@@ -9,16 +9,17 @@
         <div class="app-top-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4">
+                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4 d-inline-flex align-items-center justify-content-center">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                     <div>
                         <h4 class="fw-bold mb-0 text-white">Student Directory</h4>
-                        <span class="small text-white-50">Manage admissions &amp; class allocations</span>
+                        <span class="small text-white-50">Manage admissions, parent details &amp; class allocations</span>
                     </div>
                 </div>
-                <button type="button" class="btn btn-light text-primary btn-sm fw-bold rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                    <i class="bi bi-plus-lg me-1"></i> Add Student
+                <button type="button" class="btn btn-light text-primary btn-sm fw-bold rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Add Student</span>
                 </button>
             </div>
         </div>
@@ -46,8 +47,9 @@
                     </select>
                 </div>
                 <div class="col-6 col-md-3">
-                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold">
-                        <i class="bi bi-funnel"></i> Filter
+                    <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold d-inline-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-funnel-fill"></i>
+                        <span>Filter</span>
                     </button>
                 </div>
             </form>
@@ -66,55 +68,68 @@
             <div class="mb-3">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" id="studentSearchInput" class="form-control border-start-0 ps-0" placeholder="Type student name, roll no, or email to search...">
+                    <input type="text" id="studentSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by name, roll no, email, phone, or parent...">
                 </div>
             </div>
 
             {% if students %}
                 <div id="studentsList" class="list-group list-group-flush">
                     {% for stu in students %}
-                        <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="list-group-item px-0 py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                             <div class="d-flex align-items-center gap-3">
                                 {% if stu.user.photo_url %}
-                                    <img src="{{ stu.user.photo_url }}" alt="{{ stu.user.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 44px; height: 44px;">
+                                    <img src="{{ stu.user.photo_url }}" alt="{{ stu.user.name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 46px; height: 46px;">
                                 {% else %}
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 44px; height: 44px; font-size: 0.9rem;">
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow-sm flex-shrink-0" style="width: 46px; height: 46px; font-size: 0.95rem;">
                                         {{ stu.user.name[:2]|upper }}
                                     </div>
                                 {% endif %}
 
                                 <div>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
                                         <span class="badge bg-secondary bg-opacity-10 text-secondary fw-bold px-2 py-0.5" style="font-size: 0.75rem;">
                                             {{ stu.roll_no }}
                                         </span>
                                         <div class="fw-bold text-dark">{{ stu.user.name }}</div>
+                                        <span class="badge bg-primary-subtle text-primary" style="font-size: 0.72rem;">{{ stu.class_obj.class_name }}</span>
                                     </div>
-                                    <div class="text-muted small mt-0.5">
-                                        <span class="badge bg-primary-subtle text-primary me-1">{{ stu.class_obj.class_name }}</span>
-                                        {{ stu.user.email }}
+                                    <div class="text-muted small mt-1 d-flex flex-wrap gap-2 align-items-center">
+                                        <span><i class="bi bi-envelope text-secondary me-1"></i>{{ stu.user.email }}</span>
+                                        {% if stu.user.phone %}
+                                            <span>&bull; <i class="bi bi-telephone text-secondary me-1"></i>{{ stu.user.phone }}</span>
+                                        {% endif %}
+                                        {% if stu.father_name %}
+                                            <span>&bull; <i class="bi bi-person text-secondary me-1"></i>Father: {{ stu.father_name }}</span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 align-self-end align-self-md-center">
                                 {% if stu.user.active %}
                                     <span class="badge-success-subtle">Active</span>
                                 {% else %}
                                     <span class="alert-badge-danger">Deactivated</span>
                                 {% endif %}
 
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ stu.student_id }}">
+                                <!-- View Full Details Button -->
+                                <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#viewModal{{ stu.student_id }}" title="View Complete Profile & Parent Info">
+                                    <i class="bi bi-eye"></i> Details
+                                </button>
+
+                                <!-- Edit Button -->
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#editModal{{ stu.student_id }}" title="Edit Details">
                                     <i class="bi bi-pencil"></i>
                                 </button>
 
+                                <!-- Toggle Active / Soft Delete -->
                                 <form method="POST" action="{{ url_for('admin.toggle_student_active', student_id=stu.student_id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to {{ 'deactivate' if stu.user.active else 'activate' }} this student?');">
                                     {% if stu.user.active %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Deactivate">
                                             <i class="bi bi-person-x"></i>
                                         </button>
                                     {% else %}
-                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Activate">
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2.5" title="Activate">
                                             <i class="bi bi-person-check"></i>
                                         </button>
                                     {% endif %}
@@ -122,16 +137,108 @@
                             </div>
                         </div>
 
-                        <!-- Edit Student Modal -->
+                        <!-- 1. VIEW STUDENT FULL PROFILE MODAL -->
+                        <div class="modal fade" id="viewModal{{ stu.student_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content border-0 rounded-4 shadow">
+                                    <div class="modal-header bg-light border-bottom">
+                                        <div class="d-flex align-items-center gap-3">
+                                            {% if stu.user.photo_url %}
+                                                <img src="{{ stu.user.photo_url }}" alt="{{ stu.user.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 50px; height: 50px;">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 50px; height: 50px; font-size: 1.1rem;">
+                                                    {{ stu.user.name[:2]|upper }}
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h5 class="modal-title fw-bold text-dark mb-0">{{ stu.user.name }}</h5>
+                                                <span class="badge bg-primary me-1">{{ stu.roll_no }}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary">{{ stu.class_obj.class_name }}</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3">
+                                            <!-- Academic & Personal -->
+                                            <div class="col-12 col-md-6">
+                                                <div class="p-3 bg-light rounded-3 h-100">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person-badge-fill me-1"></i> Personal &amp; Academic</h6>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Official Email:</span>
+                                                        <strong>{{ stu.user.email }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Student Phone:</span>
+                                                        <strong>{{ stu.user.phone or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Date of Birth:</span>
+                                                        <strong>{{ stu.dob or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Gender:</span>
+                                                        <strong>{{ stu.gender or 'Not Specified' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 small">
+                                                        <span class="text-muted">Blood Group:</span>
+                                                        <strong>{{ stu.blood_group or 'Not Specified' }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Parents & Contact -->
+                                            <div class="col-12 col-md-6">
+                                                <div class="p-3 bg-light rounded-3 h-100">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-people-fill me-1"></i> Parent / Guardian Details</h6>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Father's Name:</span>
+                                                        <strong>{{ stu.father_name or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Father's Phone:</span>
+                                                        <strong>{{ stu.father_phone or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Mother's Name:</span>
+                                                        <strong>{{ stu.mother_name or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 small">
+                                                        <span class="text-muted">Mother's Phone:</span>
+                                                        <strong>{{ stu.mother_phone or 'Not Provided' }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Address -->
+                                            <div class="col-12">
+                                                <div class="p-3 bg-light rounded-3">
+                                                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-geo-alt-fill me-1"></i> Residential Address</h6>
+                                                    <p class="small text-dark mb-0">{{ stu.user.address or 'No address registered.' }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-top bg-light">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editModal{{ stu.student_id }}">
+                                            <i class="bi bi-pencil me-1"></i> Edit Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. EDIT STUDENT MODAL -->
                         <div class="modal fade" id="editModal{{ stu.student_id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content border-0 rounded-4 shadow">
                                     <form method="POST" action="{{ url_for('admin.edit_student', student_id=stu.student_id) }}" enctype="multipart/form-data">
                                         <div class="modal-header border-bottom">
-                                            <h6 class="modal-title fw-bold">Edit Student Details</h6>
+                                            <h6 class="modal-title fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Student Profile</h6>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body p-4">
                                             <!-- Current Photo Preview -->
                                             <div class="text-center mb-3">
                                                 {% if stu.user.photo_url %}
@@ -144,31 +251,90 @@
                                                 <div class="small text-muted">Upload a new photo or provide an image link</div>
                                             </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Upload Student Photo</label>
-                                                <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Or Photo URL</label>
-                                                <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://..." value="{{ stu.user.photo_url or '' }}">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Full Name</label>
-                                                <input type="text" name="name" class="form-control" value="{{ stu.user.name }}" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Roll Number</label>
-                                                <input type="text" name="roll_no" class="form-control" value="{{ stu.roll_no }}" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Assigned Class</label>
-                                                <select name="class_id" class="form-select" required>
-                                                    {% for c in classes %}
-                                                        <option value="{{ c.class_id }}" {% if stu.class_id == c.class_id %}selected{% endif %}>
-                                                            {{ c.class_name }}
-                                                        </option>
-                                                    {% endfor %}
-                                                </select>
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Upload New Photo</label>
+                                                    <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Or Photo URL</label>
+                                                    <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://..." value="{{ stu.user.photo_url or '' }}">
+                                                </div>
+
+                                                <div class="col-12"><hr class="my-1 text-muted"></div>
+                                                <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase">Academic &amp; Student Info</h6></div>
+
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Full Name *</label>
+                                                    <input type="text" name="name" class="form-control" value="{{ stu.user.name }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Roll Number *</label>
+                                                    <input type="text" name="roll_no" class="form-control" value="{{ stu.roll_no }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Assigned Class *</label>
+                                                    <select name="class_id" class="form-select" required>
+                                                        {% for c in classes %}
+                                                            <option value="{{ c.class_id }}" {% if stu.class_id == c.class_id %}selected{% endif %}>
+                                                                {{ c.class_name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Student Phone Number</label>
+                                                    <input type="tel" name="phone" class="form-control" value="{{ stu.user.phone or '' }}" placeholder="+91 98260 XXXXX">
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Date of Birth</label>
+                                                    <input type="date" name="dob" class="form-control" value="{{ stu.dob or '' }}">
+                                                </div>
+                                                <div class="col-12 col-md-2">
+                                                    <label class="form-label small fw-bold">Gender</label>
+                                                    <select name="gender" class="form-select">
+                                                        <option value="">Select</option>
+                                                        <option value="Male" {% if stu.gender == 'Male' %}selected{% endif %}>Male</option>
+                                                        <option value="Female" {% if stu.gender == 'Female' %}selected{% endif %}>Female</option>
+                                                        <option value="Other" {% if stu.gender == 'Other' %}selected{% endif %}>Other</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 col-md-2">
+                                                    <label class="form-label small fw-bold">Blood Group</label>
+                                                    <select name="blood_group" class="form-select">
+                                                        <option value="">Select</option>
+                                                        {% for bg in ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] %}
+                                                            <option value="{{ bg }}" {% if stu.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-12"><hr class="my-1 text-muted"></div>
+                                                <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase">Parents &amp; Guardian Info</h6></div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Father's Name</label>
+                                                    <input type="text" name="father_name" class="form-control" value="{{ stu.father_name or '' }}" placeholder="Mr. ...">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Father's Phone Number</label>
+                                                    <input type="tel" name="father_phone" class="form-control" value="{{ stu.father_phone or '' }}" placeholder="+91 98261 XXXXX">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Mother's Name</label>
+                                                    <input type="text" name="mother_name" class="form-control" value="{{ stu.mother_name or '' }}" placeholder="Mrs. ...">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Mother's Phone Number</label>
+                                                    <input type="tel" name="mother_phone" class="form-control" value="{{ stu.mother_phone or '' }}" placeholder="+91 98262 XXXXX">
+                                                </div>
+
+                                                <div class="col-12"><hr class="my-1 text-muted"></div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold">Residential Address</label>
+                                                    <textarea name="address" class="form-control" rows="2" placeholder="House/Flat No, Street, City, State, Pincode">{{ stu.user.address or '' }}</textarea>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer border-top">
@@ -188,48 +354,113 @@
     </div>
 </div>
 
-<!-- Add Student Modal -->
+<!-- 3. ADD STUDENT MODAL -->
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow">
             <form method="POST" action="{{ url_for('admin.manage_students') }}" enctype="multipart/form-data">
                 <div class="modal-header border-bottom">
-                    <h6 class="modal-title fw-bold">Register New Student</h6>
+                    <h6 class="modal-title fw-bold"><i class="bi bi-person-plus-fill text-primary me-2"></i>Register New Student</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Upload Student Photo</label>
-                        <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Or Photo URL (Optional)</label>
-                        <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Full Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. John Doe" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Official College Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="e.g. john@student.edu" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Default: student123">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Roll Number</label>
-                        <input type="text" name="roll_no" class="form-control" placeholder="e.g. BCA50" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Assign to Class</label>
-                        <select name="class_id" class="form-select" required>
-                            <option value="">-- Select Class --</option>
-                            {% for c in classes %}
-                                <option value="{{ c.class_id }}">{{ c.class_name }}</option>
-                            {% endfor %}
-                        </select>
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Upload Student Photo</label>
+                            <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Or Photo URL (Optional)</label>
+                            <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://...">
+                        </div>
+
+                        <div class="col-12"><hr class="my-1 text-muted"></div>
+                        <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase">Academic &amp; Student Info</h6></div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Full Name *</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Official College Email *</label>
+                            <input type="email" name="email" class="form-control" placeholder="e.g. rahul@student.edu" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Login Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Default: student123">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Roll Number *</label>
+                            <input type="text" name="roll_no" class="form-control" placeholder="e.g. BCA50" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Assign to Class *</label>
+                            <select name="class_id" class="form-select" required>
+                                <option value="">-- Select Class --</option>
+                                {% for c in classes %}
+                                    <option value="{{ c.class_id }}">{{ c.class_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Student Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 98260 12345">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Date of Birth</label>
+                            <input type="date" name="dob" class="form-control">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Gender</label>
+                            <select name="gender" class="form-select">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Blood Group</label>
+                            <select name="blood_group" class="form-select">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12"><hr class="my-1 text-muted"></div>
+                        <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase">Parents &amp; Guardian Info</h6></div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Father's Name</label>
+                            <input type="text" name="father_name" class="form-control" placeholder="e.g. Mr. Rajesh Sharma">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Father's Phone Number</label>
+                            <input type="tel" name="father_phone" class="form-control" placeholder="+91 98261 54321">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Mother's Name</label>
+                            <input type="text" name="mother_name" class="form-control" placeholder="e.g. Mrs. Sunita Sharma">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Mother's Phone Number</label>
+                            <input type="tel" name="mother_phone" class="form-control" placeholder="+91 98262 98765">
+                        </div>
+
+                        <div class="col-12"><hr class="my-1 text-muted"></div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Residential Address</label>
+                            <textarea name="address" class="form-control" rows="2" placeholder="House/Flat No, Street, City, State, Pincode"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top">

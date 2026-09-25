@@ -14,25 +14,25 @@
         <div class="mb-3">
             <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="AttenX Online Attendance Tracker" class="logo-hero-img" style="width: 200px; height: auto; filter: drop-shadow(0 10px 25px rgba(59, 130, 246, 0.35));">
         </div>
-        <p class="text-white-50 small mb-0 tracking-wide">Indore Institute of Science & Technology &bull; ERP System</p>
+        <p class="text-white-50 small mb-0 tracking-wide">Indore Institute of Science & Technology &bull; ERP &amp; Attendance System</p>
     </div>
 
     <!-- White Login Card Sliding from Bottom (Screen 1) -->
     <div class="login-card">
-        <h3 class="login-title">- Login</h3>
+        <h3 class="login-title">- Portal Login</h3>
 
         <form action="{{ url_for('auth.login') }}" method="POST">
             <!-- User Name Input -->
             <div class="custom-input-group">
                 <label for="email" class="form-label small fw-semibold text-secondary mb-1">User Name / Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="Enter student / faculty ID" autofocus>
+                <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="Enter student / faculty / admin email" autofocus>
                 <span class="input-icon"><i class="bi bi-person-fill"></i></span>
             </div>
 
             <!-- Password Input -->
             <div class="custom-input-group">
                 <label for="password" class="form-label small fw-semibold text-secondary mb-1">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
+                <input type="password" class="form-control" id="password" name="password" required placeholder="Enter account password">
                 <span class="input-icon" id="togglePassword" style="cursor: pointer; pointer-events: auto;"><i class="bi bi-eye-fill"></i></span>
             </div>
 
@@ -44,31 +44,86 @@
                         Remember me
                     </label>
                 </div>
-                <a href="javascript:void(0)" onclick="alert('Demo Mode: For test password recovery, use the Quick-Fill buttons below.');" class="small text-decoration-none text-secondary fw-semibold">
+                <a href="javascript:void(0)" onclick="alert('Demo Mode: Click any of the Quick Demo Login buttons below to log in instantly.');" class="small text-decoration-none text-secondary fw-semibold">
                     Forgot Password?
                 </a>
             </div>
 
             <!-- Prominent Login Button with Arrow -->
-            <button type="submit" class="btn btn-login-prominent w-100 py-3 mb-3">
-                <span>Login</span>
+            <button type="submit" class="btn btn-login-prominent w-100 py-3 mb-3 d-inline-flex align-items-center justify-content-center gap-2">
+                <span>Sign In to AttendX</span>
                 <i class="bi bi-arrow-right-circle fs-5"></i>
             </button>
         </form>
 
-        <!-- Quick-Fill Demo Pills -->
+        <!-- Quick-Fill Demo Logins Section -->
         <div class="pt-3 border-top mt-2">
-            <div class="text-center text-muted small fw-bold mb-2">⚡ QUICK DEMO LOGINS</div>
-            <div class="d-flex flex-wrap gap-2 justify-content-center">
-                <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold" onclick="quickLogin('rahul@student.edu', 'student123')">
-                    <i class="bi bi-mortarboard-fill"></i> Student (Rahul)
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="quickLogin('suresh@college.edu', 'teacher123')">
-                    <i class="bi bi-person-workspace"></i> Teacher (Suresh)
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3 fw-bold" onclick="quickLogin('priya@college.edu', 'admin123')">
-                    <i class="bi bi-shield-lock-fill"></i> Admin (Priya)
-                </button>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small fw-bold">⚡ 1-CLICK DEMO ACCOUNTS</span>
+                <span class="badge bg-light text-secondary border small">Multiple Logins</span>
+            </div>
+
+            <!-- Role Selector Tabs -->
+            <ul class="nav nav-pills nav-fill mb-2 bg-light p-1 rounded-pill small" id="demoRoleTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill py-1 fw-bold small" id="students-tab" data-bs-toggle="pill" data-bs-target="#students-pill" type="button" role="tab">Students (5)</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill py-1 fw-bold small" id="teachers-tab" data-bs-toggle="pill" data-bs-target="#teachers-pill" type="button" role="tab">Teachers (4)</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill py-1 fw-bold small" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin-pill" type="button" role="tab">Admin (1)</button>
+                </li>
+            </ul>
+
+            <div class="tab-content pt-1" id="demoRoleTabsContent">
+                <!-- Students Tab -->
+                <div class="tab-pane fade show active" id="students-pill" role="tabpanel">
+                    <div class="d-flex flex-wrap gap-1.5 justify-content-center">
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('rahul@student.edu', 'student123')" title="BCA 3A — Has Shortage Alert (<75%)">
+                            <i class="bi bi-mortarboard-fill"></i> Rahul (BCA 3A)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('anita@student.edu', 'student123')" title="BCA 3A — High Attendance (92%)">
+                            <i class="bi bi-mortarboard"></i> Anita (BCA 3A)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('rohan@student.edu', 'student123')" title="BCA 3A">
+                            <i class="bi bi-mortarboard"></i> Rohan (BCA 3A)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('pooja@student.edu', 'student123')" title="BCA 3B">
+                            <i class="bi bi-mortarboard"></i> Pooja (BCA 3B)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('kavita@student.edu', 'student123')" title="MCA 1A">
+                            <i class="bi bi-mortarboard"></i> Kavita (MCA 1A)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Teachers Tab -->
+                <div class="tab-pane fade" id="teachers-pill" role="tabpanel">
+                    <div class="d-flex flex-wrap gap-1.5 justify-content-center">
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('suresh@college.edu', 'teacher123')" title="DBMS & Python Faculty">
+                            <i class="bi bi-person-workspace"></i> Prof. Suresh (DBMS/Py)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('meera@college.edu', 'teacher123')" title="Networks & DSA Faculty">
+                            <i class="bi bi-person-workspace"></i> Prof. Meera (CN/DSA)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('rajesh@college.edu', 'teacher123')" title="Cloud Computing Faculty">
+                            <i class="bi bi-person-workspace"></i> Dr. Rajesh (Cloud)
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 fw-bold" onclick="quickLogin('ananya@college.edu', 'teacher123')" title="Software Engineering Faculty">
+                            <i class="bi bi-person-workspace"></i> Prof. Ananya (SE)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin Tab -->
+                <div class="tab-pane fade" id="admin-pill" role="tabpanel">
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-4 py-1.5 fw-bold" onclick="quickLogin('priya@college.edu', 'admin123')" title="Full Institutional Administrator">
+                            <i class="bi bi-shield-lock-fill"></i> Principal / Admin (Priya Rao)
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

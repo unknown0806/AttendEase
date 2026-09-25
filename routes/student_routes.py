@@ -198,11 +198,64 @@ def results():
 
     return render_template('student/results.html', user=user, student=student, marks_list=marks_list, cgpa=cgpa)
 
-@student_bp.route('/profile')
+@student_bp.route('/profile', methods=['GET', 'POST'])
 @role_required('student')
 def profile():
     user = get_current_user()
     student = Student.query.filter_by(user_id=user.user_id).first()
+    
+    if request.method == 'POST':
+        phone = request.form.get('phone', '').strip()
+        address = request.form.get('address', '').strip()
+        father_name = request.form.get('father_name', '').strip()
+        mother_name = request.form.get('mother_name', '').strip()
+        father_phone = request.form.get('father_phone', '').strip()
+        mother_phone = request.form.get('mother_phone', '').strip()
+        dob = request.form.get('dob', '').strip()
+        gender = request.form.get('gender', '').strip()
+        blood_group = request.form.get('blood_group', '').strip()
+        photo_url_input = request.form.get('photo_url', '').strip()
+        photo_file = request.files.get('photo_file')
+        
+        current_password = request.form.get('current_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        # Password update check
+        if new_password:
+            if not current_password or not user.check_password(current_password):
+                flash('Current password is required and must be correct to set a new password.', 'danger')
+                return redirect(url_for('student.profile'))
+            if new_password != confirm_password:
+                flash('New password and confirmation do not match.', 'danger')
+                return redirect(url_for('student.profile'))
+            if len(new_password) < 6:
+                flash('New password must be at least 6 characters long.', 'danger')
+                return redirect(url_for('student.profile'))
+            user.set_password(new_password)
+
+        from routes.admin_routes import save_avatar_file
+        saved_file = save_avatar_file(photo_file, prefix=f"stu_{student.roll_no}")
+        if saved_file:
+            user.photo_url = saved_file
+        elif photo_url_input:
+            user.photo_url = photo_url_input
+
+        user.phone = phone if phone else None
+        user.address = address if address else None
+        
+        student.father_name = father_name if father_name else None
+        student.mother_name = mother_name if mother_name else None
+        student.father_phone = father_phone if father_phone else None
+        student.mother_phone = mother_phone if mother_phone else None
+        student.dob = dob if dob else None
+        student.gender = gender if gender else None
+        student.blood_group = blood_group if blood_group else None
+        
+        db.session.commit()
+        flash('Your student profile has been updated successfully!', 'success')
+        return redirect(url_for('student.profile'))
+
     return render_template('student/profile.html', user=user, student=student)
 
 @student_bp.route('/messages')

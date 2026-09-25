@@ -9,20 +9,22 @@
         <div class="app-top-header">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4">
+                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4 d-inline-flex align-items-center justify-content-center">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                     <div>
                         <h4 class="fw-bold mb-0 text-white">Faculty Directory</h4>
-                        <span class="small text-white-50">Onboard faculty &amp; map course workload</span>
+                        <span class="small text-white-50">Onboard faculty, manage profiles &amp; assign workloads</span>
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#assignTeacherModal">
-                        <i class="bi bi-link-45deg me-1"></i> Map Class
+                    <button type="button" class="btn btn-outline-light btn-sm fw-bold rounded-pill px-3 d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#assignTeacherModal">
+                        <i class="bi bi-link-45deg"></i>
+                        <span>Map Class</span>
                     </button>
-                    <button type="button" class="btn btn-light text-primary btn-sm fw-bold rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-                        <i class="bi bi-plus-lg me-1"></i> Add Faculty
+                    <button type="button" class="btn btn-light text-primary btn-sm fw-bold rounded-pill px-3 shadow-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Add Faculty</span>
                     </button>
                 </div>
             </div>
@@ -41,27 +43,40 @@
             <div class="mb-3">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" id="teacherSearchInput" class="form-control border-start-0 ps-0" placeholder="Type faculty name, email, or subject to search...">
+                    <input type="text" id="teacherSearchInput" class="form-control border-start-0 ps-0" placeholder="Search by faculty name, email, department, or subject...">
                 </div>
             </div>
 
             {% if teachers %}
                 <div id="teachersList" class="list-group list-group-flush">
                     {% for t in teachers %}
-                        <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div class="list-group-item px-0 py-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                             <div class="d-flex align-items-center gap-3">
                                 {% if t.photo_url %}
-                                    <img src="{{ t.photo_url }}" alt="{{ t.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 46px; height: 46px;">
+                                    <img src="{{ t.photo_url }}" alt="{{ t.name }}" class="rounded-circle object-fit-cover border shadow-sm flex-shrink-0" style="width: 48px; height: 48px;">
                                 {% else %}
-                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 46px; height: 46px; font-size: 1rem;">
-                                        {{ t.name[0] }}
+                                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow-sm flex-shrink-0" style="width: 48px; height: 48px; font-size: 1rem;">
+                                        {{ t.name[:2]|upper }}
                                     </div>
                                 {% endif %}
 
                                 <div>
-                                    <div class="fw-bold text-dark">Prof. {{ t.name }}</div>
-                                    <div class="text-muted small mb-1">{{ t.email }}</div>
-                                    <div class="d-flex flex-wrap gap-1">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <div class="fw-bold text-dark fs-6">{{ t.name }}</div>
+                                        {% if t.designation %}
+                                            <span class="badge bg-info-subtle text-info border" style="font-size: 0.72rem;">{{ t.designation }}</span>
+                                        {% endif %}
+                                        {% if t.department %}
+                                            <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.72rem;">{{ t.department }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted small mt-1 d-flex flex-wrap gap-2 align-items-center">
+                                        <span><i class="bi bi-envelope text-secondary me-1"></i>{{ t.email }}</span>
+                                        {% if t.phone %}
+                                            <span>&bull; <i class="bi bi-telephone text-secondary me-1"></i>{{ t.phone }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-1 mt-1.5">
                                         {% for a in t.teacher_assignments %}
                                             <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.7rem;">
                                                 {{ a.class_obj.class_name }}: {{ a.subject.subject_name }}
@@ -71,24 +86,31 @@
                                 </div>
                             </div>
 
-                            <div class="d-flex align-items-center gap-2">
+                            <div class="d-flex align-items-center gap-2 align-self-end align-self-md-center">
                                 {% if t.active %}
                                     <span class="badge-success-subtle">Active</span>
                                 {% else %}
                                     <span class="alert-badge-danger">Deactivated</span>
                                 {% endif %}
 
-                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editTeacherModal{{ t.user_id }}">
+                                <!-- View Details Modal Button -->
+                                <button type="button" class="btn btn-sm btn-outline-info rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#viewTeacherModal{{ t.user_id }}" title="View Complete Faculty Details">
+                                    <i class="bi bi-eye"></i> Details
+                                </button>
+
+                                <!-- Edit Teacher Button -->
+                                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5" data-bs-toggle="modal" data-bs-target="#editTeacherModal{{ t.user_id }}" title="Edit Details">
                                     <i class="bi bi-pencil"></i>
                                 </button>
 
+                                <!-- Toggle Active / Soft Delete -->
                                 <form method="POST" action="{{ url_for('admin.toggle_teacher_active', teacher_id=t.user_id) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to {{ 'deactivate' if t.active else 'activate' }} this teacher?');">
                                     {% if t.active %}
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Deactivate">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5" title="Deactivate">
                                             <i class="bi bi-person-x"></i>
                                         </button>
                                     {% else %}
-                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Activate">
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2.5" title="Activate">
                                             <i class="bi bi-person-check"></i>
                                         </button>
                                     {% endif %}
@@ -96,43 +118,147 @@
                             </div>
                         </div>
 
-                        <!-- Edit Teacher Modal -->
+                        <!-- 1. VIEW TEACHER FULL DETAILS MODAL -->
+                        <div class="modal fade" id="viewTeacherModal{{ t.user_id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content border-0 rounded-4 shadow">
+                                    <div class="modal-header bg-light border-bottom">
+                                        <div class="d-flex align-items-center gap-3">
+                                            {% if t.photo_url %}
+                                                <img src="{{ t.photo_url }}" alt="{{ t.name }}" class="rounded-circle object-fit-cover border shadow-sm" style="width: 52px; height: 52px;">
+                                            {% else %}
+                                                <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 52px; height: 52px; font-size: 1.1rem;">
+                                                    {{ t.name[:2]|upper }}
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <h5 class="modal-title fw-bold text-dark mb-0">{{ t.name }}</h5>
+                                                <span class="badge bg-primary me-1">{{ t.designation or 'Faculty' }}</span>
+                                                <span class="badge bg-secondary-subtle text-secondary">{{ t.department or 'Academic Department' }}</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body p-4">
+                                        <div class="row g-3">
+                                            <div class="col-12 col-md-6">
+                                                <div class="p-3 bg-light rounded-3 h-100">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-briefcase-fill me-1"></i> Academic Profile</h6>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Official Email:</span>
+                                                        <strong>{{ t.email }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Contact Phone:</span>
+                                                        <strong>{{ t.phone or 'Not Provided' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 border-bottom small">
+                                                        <span class="text-muted">Department:</span>
+                                                        <strong>{{ t.department or 'General' }}</strong>
+                                                    </div>
+                                                    <div class="d-flex justify-content-between py-1 small">
+                                                        <span class="text-muted">Qualifications:</span>
+                                                        <strong>{{ t.qualification or 'Not Specified' }}</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 col-md-6">
+                                                <div class="p-3 bg-light rounded-3 h-100">
+                                                    <h6 class="fw-bold text-primary mb-3"><i class="bi bi-journal-bookmark-fill me-1"></i> Course Workloads</h6>
+                                                    {% if t.teacher_assignments %}
+                                                        <ul class="list-group list-group-flush bg-transparent small">
+                                                            {% for a in t.teacher_assignments %}
+                                                                <li class="list-group-item bg-transparent px-0 py-1.5 d-flex justify-content-between align-items-center">
+                                                                    <span>{{ a.subject.subject_name }}</span>
+                                                                    <span class="badge bg-primary-subtle text-primary">{{ a.class_obj.class_name }}</span>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% else %}
+                                                        <p class="text-muted small mb-0">No classes mapped to this faculty member yet.</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="p-3 bg-light rounded-3">
+                                                    <h6 class="fw-bold text-primary mb-2"><i class="bi bi-geo-alt-fill me-1"></i> Address Details</h6>
+                                                    <p class="small text-dark mb-0">{{ t.address or 'No address registered.' }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-top bg-light">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary btn-sm fw-bold" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#editTeacherModal{{ t.user_id }}">
+                                            <i class="bi bi-pencil me-1"></i> Edit Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. EDIT TEACHER MODAL -->
                         <div class="modal fade" id="editTeacherModal{{ t.user_id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
                                 <div class="modal-content border-0 rounded-4 shadow">
                                     <form method="POST" action="{{ url_for('admin.edit_teacher', teacher_id=t.user_id) }}" enctype="multipart/form-data">
                                         <div class="modal-header border-bottom">
-                                            <h6 class="modal-title fw-bold">Edit Faculty Details</h6>
+                                            <h6 class="modal-title fw-bold"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Faculty Profile</h6>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                         </div>
-                                        <div class="modal-body">
-                                            <!-- Current Photo Preview -->
+                                        <div class="modal-body p-4">
                                             <div class="text-center mb-3">
                                                 {% if t.photo_url %}
                                                     <img src="{{ t.photo_url }}" alt="{{ t.name }}" class="rounded-circle object-fit-cover border shadow-sm mb-2" style="width: 70px; height: 70px;">
                                                 {% else %}
                                                     <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center fw-bold shadow-sm mb-2" style="width: 70px; height: 70px; font-size: 1.5rem;">
-                                                        {{ t.name[0] }}
+                                                        {{ t.name[:2]|upper }}
                                                     </div>
                                                 {% endif %}
-                                                <div class="small text-muted">Upload a new photo or provide an image link</div>
                                             </div>
 
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Upload Faculty Photo</label>
-                                                <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Or Photo URL</label>
-                                                <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://..." value="{{ t.photo_url or '' }}">
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Full Name</label>
-                                                <input type="text" name="name" class="form-control" value="{{ t.name }}" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold">Official Email</label>
-                                                <input type="email" name="email" class="form-control" value="{{ t.email }}" required>
+                                            <div class="row g-3">
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Upload New Photo</label>
+                                                    <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Or Photo URL</label>
+                                                    <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://..." value="{{ t.photo_url or '' }}">
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Full Name *</label>
+                                                    <input type="text" name="name" class="form-control" value="{{ t.name }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Email Address *</label>
+                                                    <input type="email" name="email" class="form-control" value="{{ t.email }}" required>
+                                                </div>
+
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Phone Number</label>
+                                                    <input type="tel" name="phone" class="form-control" value="{{ t.phone or '' }}" placeholder="+91 98265 XXXXX">
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Department</label>
+                                                    <input type="text" name="department" class="form-control" value="{{ t.department or '' }}" placeholder="e.g. Computer Science">
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">Designation</label>
+                                                    <input type="text" name="designation" class="form-control" value="{{ t.designation or '' }}" placeholder="e.g. Assistant Professor">
+                                                </div>
+
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Qualifications</label>
+                                                    <input type="text" name="qualification" class="form-control" value="{{ t.qualification or '' }}" placeholder="e.g. Ph.D., M.Tech (CSE)">
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Address</label>
+                                                    <input type="text" name="address" class="form-control" value="{{ t.address or '' }}" placeholder="City, State">
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="modal-footer border-top">
@@ -146,83 +272,108 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="alert alert-info mb-0">No faculty members registered yet.</div>
+                <div class="alert alert-info mb-0">No faculty members found.</div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- Add Teacher Modal -->
+<!-- 3. ADD TEACHER MODAL -->
 <div class="modal fade" id="addTeacherModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 rounded-4 shadow">
             <form method="POST" action="{{ url_for('admin.manage_teachers') }}" enctype="multipart/form-data">
                 <div class="modal-header border-bottom">
-                    <h6 class="modal-title fw-bold">Register New Faculty</h6>
+                    <h6 class="modal-title fw-bold"><i class="bi bi-person-plus-fill text-primary me-2"></i>Register New Faculty Member</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Upload Faculty Photo</label>
-                        <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Or Photo URL (Optional)</label>
-                        <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Full Name</label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. Dr. Rajesh Sharma" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Official Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="e.g. rajesh@college.edu" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Default: teacher123">
+                <div class="modal-body p-4">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Upload Faculty Photo</label>
+                            <input type="file" name="photo_file" class="form-control form-control-sm" accept="image/*">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Or Photo URL (Optional)</label>
+                            <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://...">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Full Name *</label>
+                            <input type="text" name="name" class="form-control" placeholder="e.g. Dr. Rajesh Iyer" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Official College Email *</label>
+                            <input type="email" name="email" class="form-control" placeholder="e.g. rajesh@college.edu" required>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Login Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Default: teacher123">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+91 98265 11223">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Department</label>
+                            <input type="text" name="department" class="form-control" placeholder="e.g. Computer Science">
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label class="form-label small fw-bold">Designation</label>
+                            <input type="text" name="designation" class="form-control" placeholder="e.g. Associate Professor">
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Qualifications</label>
+                            <input type="text" name="qualification" class="form-control" placeholder="e.g. Ph.D. in AI, M.Tech">
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small fw-bold">Address Details</label>
+                            <input type="text" name="address" class="form-control" placeholder="e.g. Professors Colony, Indore">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Add Faculty</button>
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Register Faculty</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Assign Teacher Modal -->
+<!-- 4. MAP CLASS MODAL -->
 <div class="modal fade" id="assignTeacherModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 rounded-4 shadow">
-            <form method="POST" id="assignForm">
+            <form method="POST" action="{{ url_for('admin.assign_teacher_bulk') }}">
                 <div class="modal-header border-bottom">
-                    <h6 class="modal-title fw-bold">Assign Faculty to Class &amp; Subject</h6>
+                    <h6 class="modal-title fw-bold"><i class="bi bi-link-45deg text-primary me-2"></i>Map Teacher to Subject &amp; Class</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Select Teacher</label>
-                        <select id="teacherSelect" class="form-select form-select-sm" required onchange="document.getElementById('assignForm').action = '/admin/teachers/' + this.value + '/assign';">
-                            <option value="">-- Choose Teacher --</option>
-                            {% for t in teachers %}
-                                <option value="{{ t.user_id }}">Prof. {{ t.name }} ({{ t.email }})</option>
+                        <label class="form-label small fw-bold">Select Faculty Member *</label>
+                        <select name="teacher_id" class="form-select" required>
+                            <option value="">-- Choose Faculty --</option>
+                            {% for t in teachers if t.active %}
+                                <option value="{{ t.user_id }}">{{ t.name }} ({{ t.department or 'Faculty' }})</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Select Class Section</label>
-                        <select name="class_id" class="form-select form-select-sm" required>
-                            <option value="">-- Choose Class --</option>
+                        <label class="form-label small fw-bold">Select Class *</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">-- Choose Class Section --</option>
                             {% for c in classes %}
                                 <option value="{{ c.class_id }}">{{ c.class_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Select Subject</label>
-                        <select name="subject_id" class="form-select form-select-sm" required>
+                        <label class="form-label small fw-bold">Select Subject *</label>
+                        <select name="subject_id" class="form-select" required>
                             <option value="">-- Choose Subject --</option>
                             {% for s in subjects %}
                                 <option value="{{ s.subject_id }}">{{ s.subject_name }}</option>
@@ -232,7 +383,7 @@
                 </div>
                 <div class="modal-footer border-top">
                     <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Confirm Assignment</button>
+                    <button type="submit" class="btn btn-primary btn-sm fw-bold">Assign Workload</button>
                 </div>
             </form>
         </div>

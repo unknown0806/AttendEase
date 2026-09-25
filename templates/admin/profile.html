@@ -1,57 +1,133 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Profile & Settings — Admin Portal{% endblock %}
+{% block title %}Admin Profile &amp; Settings — AttendX{% endblock %}
 
 {% block content %}
 <div class="row g-3 py-2">
     <!-- Header with Back Button -->
     <div class="col-12">
         <div class="app-top-header">
-            <div class="d-flex align-items-center gap-3">
-                <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4">
-                    <i class="bi bi-chevron-left"></i>
-                </a>
-                <div>
-                    <h4 class="fw-bold mb-0 text-white">Administrator Profile &amp; Settings</h4>
-                    <span class="small text-white-50">System governance &amp; security policies</span>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{{ url_for('admin.dashboard') }}" class="text-white fs-4 d-inline-flex align-items-center justify-content-center">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <div>
+                        <h4 class="fw-bold mb-0 text-white">Administrator Profile &amp; Settings</h4>
+                        <span class="small text-white-50">System governance, institutional contact &amp; security</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Admin Profile Card -->
-    <div class="col-12">
-        <div class="app-card text-center p-4 border-danger shadow-sm">
-            <div class="avatar-circle mx-auto mb-3" style="width: 72px; height: 72px; font-size: 1.8rem; background: #fee2e2; color: #dc2626;">
-                <i class="bi bi-shield-lock-fill"></i>
+    <!-- Admin Summary Card -->
+    <div class="col-12 col-lg-4">
+        <div class="app-card text-center p-4 border-danger shadow-sm h-100">
+            <div class="position-relative d-inline-block mb-3">
+                {% if user.photo_url %}
+                    <img src="{{ user.photo_url }}" alt="{{ user.name }}" class="rounded-circle object-fit-cover border border-3 border-danger shadow" style="width: 100px; height: 100px;">
+                {% else %}
+                    <div class="avatar-circle mx-auto" style="width: 100px; height: 100px; font-size: 2.2rem; background: #fee2e2; color: #dc2626;">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                {% endif %}
+                <span class="badge bg-danger position-absolute bottom-0 end-0 rounded-pill p-2" title="System Administrator"><i class="bi bi-shield-check"></i></span>
             </div>
-            <h5 class="fw-bold text-dark mb-1">{{ user.name }}</h5>
-            <div class="badge bg-danger px-3 py-2 mb-3">System Administrator &bull; HOD Office</div>
+
+            <h5 class="fw-extrabold text-dark mb-1">{{ user.name }}</h5>
+            <div class="badge bg-danger px-3 py-1.5 mb-3">System Administrator &bull; HOD Office</div>
 
             <div class="text-start bg-light p-3 rounded-4 small">
                 <div class="d-flex justify-content-between py-2 border-bottom">
                     <span class="text-muted">Admin Account:</span>
-                    <strong class="text-dark">{{ user.email }}</strong>
+                    <strong class="text-dark text-break">{{ user.email }}</strong>
                 </div>
                 <div class="d-flex justify-content-between py-2 border-bottom">
-                    <span class="text-muted">Audited Overrides Authority:</span>
-                    <strong class="text-success"><i class="bi bi-check-circle-fill"></i> Enabled</strong>
+                    <span class="text-muted">Contact Phone:</span>
+                    <strong class="text-dark">{{ user.phone or 'Not Set' }}</strong>
                 </div>
                 <div class="d-flex justify-content-between py-2 border-bottom">
-                    <span class="text-muted">Attendance Lock Engine:</span>
-                    <strong class="text-primary">Strict Enforced</strong>
+                    <span class="text-muted">Audit Logging:</span>
+                    <strong class="text-success"><i class="bi bi-check-circle-fill"></i> Immutable Ledger</strong>
                 </div>
                 <div class="d-flex justify-content-between py-2">
-                    <span class="text-muted">Shortage Warning Threshold:</span>
-                    <strong class="text-danger">75.0% Mandatory</strong>
+                    <span class="text-muted">Attendance Lock:</span>
+                    <strong class="text-primary"><i class="bi bi-lock-fill"></i> Strict Active</strong>
                 </div>
             </div>
 
             <div class="mt-4">
-                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm w-100 py-2 fw-bold">
-                    <i class="bi bi-box-arrow-right me-1"></i> Sign Out of Admin Portal
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm w-100 py-2 fw-bold d-inline-flex align-items-center justify-content-center gap-1">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sign Out of Admin Portal</span>
                 </a>
             </div>
+        </div>
+    </div>
+
+    <!-- Edit Admin Form & Security -->
+    <div class="col-12 col-lg-8">
+        <div class="app-card p-4">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-gear text-primary me-2"></i>Update Admin Information</h5>
+
+            <form method="POST" action="{{ url_for('admin.profile') }}" enctype="multipart/form-data">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Upload Admin Photo</label>
+                        <input type="file" name="photo_file" class="form-control" accept="image/*">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Or Photo URL</label>
+                        <input type="url" name="photo_url" class="form-control" placeholder="https://..." value="{{ user.photo_url or '' }}">
+                    </div>
+
+                    <div class="col-12"><hr class="my-1 text-muted"></div>
+                    <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase"><i class="bi bi-person-badge me-1"></i>Personal &amp; Contact Details</h6></div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Full Name *</label>
+                        <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Email Address *</label>
+                        <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Phone Number</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ user.phone or '' }}" placeholder="+91 98260 XXXXX">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label small fw-bold">Office Location / Address</label>
+                        <input type="text" name="address" class="form-control" value="{{ user.address or '' }}" placeholder="e.g. Admin Block, Room 101">
+                    </div>
+
+                    <!-- Security & Password Change -->
+                    <div class="col-12"><hr class="my-1 text-muted"></div>
+                    <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase"><i class="bi bi-shield-lock me-1"></i>Change Password (Optional)</h6></div>
+
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-bold">Current Password</label>
+                        <input type="password" name="current_password" class="form-control" placeholder="Enter current password">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-bold">New Password</label>
+                        <input type="password" name="new_password" class="form-control" placeholder="Min. 6 characters">
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label class="form-label small fw-bold">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Re-type new password">
+                    </div>
+
+                    <div class="col-12 pt-3">
+                        <button type="submit" class="btn btn-primary px-4 py-2 fw-bold rounded-pill shadow-sm d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-check2-circle fs-5"></i>
+                            <span>Save Profile Changes</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

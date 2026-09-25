@@ -66,11 +66,20 @@ def manage_students():
         password = request.form.get('password', 'student123').strip()
         roll_no = request.form.get('roll_no', '').strip()
         class_id = request.form.get('class_id', type=int)
+        phone = request.form.get('phone', '').strip()
+        address = request.form.get('address', '').strip()
+        father_name = request.form.get('father_name', '').strip()
+        mother_name = request.form.get('mother_name', '').strip()
+        father_phone = request.form.get('father_phone', '').strip()
+        mother_phone = request.form.get('mother_phone', '').strip()
+        dob = request.form.get('dob', '').strip()
+        gender = request.form.get('gender', '').strip()
+        blood_group = request.form.get('blood_group', '').strip()
         photo_url_input = request.form.get('photo_url', '').strip()
         photo_file = request.files.get('photo_file')
 
         if not name or not email or not roll_no or not class_id:
-            flash('All student fields are required.', 'danger')
+            flash('Name, email, roll number, and class are required.', 'danger')
             return redirect(url_for('admin.manage_students'))
 
         if User.query.filter_by(email=email).first():
@@ -91,16 +100,35 @@ def manage_students():
 
         try:
             # Atomic creation of User and Student records
-            new_user = User(name=name, email=email, role='student', photo_url=final_photo, active=True)
+            new_user = User(
+                name=name,
+                email=email,
+                role='student',
+                phone=phone if phone else None,
+                address=address if address else None,
+                photo_url=final_photo,
+                active=True
+            )
             new_user.set_password(password if password else 'student123')
             db.session.add(new_user)
             db.session.flush() # populate user_id
 
-            new_student = Student(user_id=new_user.user_id, roll_no=roll_no, class_id=class_id)
+            new_student = Student(
+                user_id=new_user.user_id,
+                roll_no=roll_no,
+                class_id=class_id,
+                father_name=father_name if father_name else None,
+                mother_name=mother_name if mother_name else None,
+                father_phone=father_phone if father_phone else None,
+                mother_phone=mother_phone if mother_phone else None,
+                dob=dob if dob else None,
+                gender=gender if gender else None,
+                blood_group=blood_group if blood_group else None
+            )
             db.session.add(new_student)
             db.session.commit()
 
-            flash(f'Student "{name}" ({roll_no}) added successfully!', 'success')
+            flash(f'Student "{name}" ({roll_no}) registered successfully with full profile details!', 'success')
         except Exception as e:
             db.session.rollback()
             flash(f'Error adding student: {str(e)}', 'danger')
@@ -136,6 +164,15 @@ def edit_student(student_id):
     name = request.form.get('name', '').strip()
     roll_no = request.form.get('roll_no', '').strip()
     class_id = request.form.get('class_id', type=int)
+    phone = request.form.get('phone', '').strip()
+    address = request.form.get('address', '').strip()
+    father_name = request.form.get('father_name', '').strip()
+    mother_name = request.form.get('mother_name', '').strip()
+    father_phone = request.form.get('father_phone', '').strip()
+    mother_phone = request.form.get('mother_phone', '').strip()
+    dob = request.form.get('dob', '').strip()
+    gender = request.form.get('gender', '').strip()
+    blood_group = request.form.get('blood_group', '').strip()
     photo_url_input = request.form.get('photo_url', '').strip()
     photo_file = request.files.get('photo_file')
 
@@ -157,11 +194,20 @@ def edit_student(student_id):
         student.user.photo_url = photo_url_input
 
     student.user.name = name
+    student.user.phone = phone if phone else None
+    student.user.address = address if address else None
     student.roll_no = roll_no
     student.class_id = class_id
+    student.father_name = father_name if father_name else None
+    student.mother_name = mother_name if mother_name else None
+    student.father_phone = father_phone if father_phone else None
+    student.mother_phone = mother_phone if mother_phone else None
+    student.dob = dob if dob else None
+    student.gender = gender if gender else None
+    student.blood_group = blood_group if blood_group else None
     db.session.commit()
 
-    flash(f'Student "{name}" updated successfully.', 'success')
+    flash(f'Student "{name}" profile updated successfully.', 'success')
     return redirect(url_for('admin.manage_students'))
 
 @admin_bp.route('/students/<int:student_id>/deactivate', methods=['POST'])
@@ -185,6 +231,11 @@ def manage_teachers():
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
         password = request.form.get('password', 'teacher123').strip()
+        phone = request.form.get('phone', '').strip()
+        address = request.form.get('address', '').strip()
+        department = request.form.get('department', '').strip()
+        designation = request.form.get('designation', '').strip()
+        qualification = request.form.get('qualification', '').strip()
         photo_url_input = request.form.get('photo_url', '').strip()
         photo_file = request.files.get('photo_file')
 
@@ -204,12 +255,23 @@ def manage_teachers():
         elif photo_url_input:
             final_photo = photo_url_input
 
-        new_teacher = User(name=name, email=email, role='teacher', photo_url=final_photo, active=True)
+        new_teacher = User(
+            name=name,
+            email=email,
+            role='teacher',
+            phone=phone if phone else None,
+            address=address if address else None,
+            department=department if department else None,
+            designation=designation if designation else None,
+            qualification=qualification if qualification else None,
+            photo_url=final_photo,
+            active=True
+        )
         new_teacher.set_password(password if password else 'teacher123')
         db.session.add(new_teacher)
         db.session.commit()
 
-        flash(f'Teacher "{name}" added successfully!', 'success')
+        flash(f'Faculty member "{name}" registered successfully!', 'success')
         return redirect(url_for('admin.manage_teachers'))
 
     teachers = User.query.filter_by(role='teacher').order_by(User.name).all()
@@ -231,6 +293,11 @@ def edit_teacher(teacher_id):
     teacher = User.query.filter_by(user_id=teacher_id, role='teacher').first_or_404()
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
+    phone = request.form.get('phone', '').strip()
+    address = request.form.get('address', '').strip()
+    department = request.form.get('department', '').strip()
+    designation = request.form.get('designation', '').strip()
+    qualification = request.form.get('qualification', '').strip()
     photo_url_input = request.form.get('photo_url', '').strip()
     photo_file = request.files.get('photo_file')
 
@@ -251,9 +318,14 @@ def edit_teacher(teacher_id):
 
     teacher.name = name
     teacher.email = email
+    teacher.phone = phone if phone else None
+    teacher.address = address if address else None
+    teacher.department = department if department else None
+    teacher.designation = designation if designation else None
+    teacher.qualification = qualification if qualification else None
     db.session.commit()
 
-    flash(f'Teacher "{name}" updated successfully.', 'success')
+    flash(f'Faculty "{name}" profile updated successfully.', 'success')
     return redirect(url_for('admin.manage_teachers'))
 
 @admin_bp.route('/teachers/<int:teacher_id>/assign', methods=['POST'])
@@ -593,9 +665,60 @@ def timetable():
     periods = Period.query.order_by(Period.period_id).all()
     return render_template('admin/timetable.html', classes=classes, periods=periods)
 
-@admin_bp.route('/profile')
+@admin_bp.route('/profile', methods=['GET', 'POST'])
 @role_required('admin')
 def profile():
     user = get_current_user()
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()
+        address = request.form.get('address', '').strip()
+        current_password = request.form.get('current_password', '')
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        photo_url_input = request.form.get('photo_url', '').strip()
+        photo_file = request.files.get('photo_file')
+
+        if not name or not email:
+            flash('Name and email are required.', 'danger')
+            return redirect(url_for('admin.profile'))
+
+        existing = User.query.filter(User.email == email, User.user_id != user.user_id).first()
+        if existing:
+            flash('This email is already registered to another account.', 'danger')
+            return redirect(url_for('admin.profile'))
+
+        # Check password update if requested
+        if new_password:
+            if not current_password or not user.check_password(current_password):
+                flash('Current password is required and must be correct to set a new password.', 'danger')
+                return redirect(url_for('admin.profile'))
+            if new_password != confirm_password:
+                flash('New password and confirmation do not match.', 'danger')
+                return redirect(url_for('admin.profile'))
+            if len(new_password) < 6:
+                flash('New password must be at least 6 characters long.', 'danger')
+                return redirect(url_for('admin.profile'))
+            user.set_password(new_password)
+
+        # Photo handling
+        saved_file = save_avatar_file(photo_file, prefix=f"admin_{user.user_id}")
+        if saved_file:
+            user.photo_url = saved_file
+        elif photo_url_input:
+            user.photo_url = photo_url_input
+
+        user.name = name
+        user.email = email
+        user.phone = phone if phone else None
+        user.address = address if address else None
+        db.session.commit()
+
+        # Update session display name
+        session['user_name'] = user.name
+        flash('Admin profile updated successfully!', 'success')
+        return redirect(url_for('admin.profile'))
+
     return render_template('admin/profile.html', user=user)
 

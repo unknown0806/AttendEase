@@ -1,6 +1,7 @@
 /**
- * AttendX — Interactive 3D Background Engine (Three.js)
- * High-performance, lightweight, non-intrusive floating geometric meshes & particles.
+ * AttendX — Elegant Academic 3D Background (Three.js)
+ * Clean, subtle, low-opacity geometric nodes & constellation particles
+ * designed specifically to harmonize with the academic blue palette.
  */
 
 (function () {
@@ -15,7 +16,7 @@
     }
 
     let scene, camera, renderer;
-    let particleSystem, meshGroup;
+    let particleSystem, lineSegments;
     let width = window.innerWidth;
     let height = window.innerHeight;
     let mouseX = 0, mouseY = 0;
@@ -23,15 +24,20 @@
     let animationFrameId = null;
     let isMobile = width < 768;
 
+    const NODE_COUNT = isMobile ? 35 : 70;
+    const MAX_DISTANCE = 16;
+    const nodePositions = [];
+    const nodeVelocities = [];
+
     function init() {
         // 1. Scene setup
         scene = new THREE.Scene();
 
         // 2. Camera setup
-        camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        camera.position.z = 45;
+        camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 1000);
+        camera.position.z = 40;
 
-        // 3. Renderer setup with alpha transparency
+        // 3. Renderer setup
         renderer = new THREE.WebGLRenderer({
             canvas: canvas,
             alpha: true,
@@ -40,143 +46,68 @@
         });
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
         renderer.setSize(width, height);
-        renderer.setClearColor(0x000000, 0); // Completely transparent
+        renderer.setClearColor(0x000000, 0);
 
-        // 4. Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-        scene.add(ambientLight);
-
-        const pointLight1 = new THREE.PointLight(0x38bdf8, 1.3, 100);
-        pointLight1.position.set(20, 20, 20);
-        scene.add(pointLight1);
-
-        const pointLight2 = new THREE.PointLight(0x10b981, 1.4, 100);
-        pointLight2.position.set(-20, -20, 15);
-        scene.add(pointLight2);
-
-        // 5. Create Subtle Floating Geometric Shapes
-        meshGroup = new THREE.Group();
-        const geometries = [
-            new THREE.IcosahedronGeometry(1.6, 0),
-            new THREE.OctahedronGeometry(1.4, 0),
-            new THREE.TetrahedronGeometry(1.8, 0),
-            new THREE.DodecahedronGeometry(1.5, 0),
-            new THREE.TorusGeometry(1.2, 0.35, 8, 16)
-        ];
-
-        const meshMaterials = [
-            new THREE.MeshStandardMaterial({
-                color: 0x3b82f6,
-                roughness: 0.3,
-                metalness: 0.2,
-                transparent: true,
-                opacity: 0.22,
-                wireframe: false
-            }),
-            new THREE.MeshStandardMaterial({
-                color: 0x10b981,
-                roughness: 0.2,
-                metalness: 0.3,
-                transparent: true,
-                opacity: 0.20,
-                wireframe: true
-            }),
-            new THREE.MeshStandardMaterial({
-                color: 0x6366f1,
-                roughness: 0.4,
-                metalness: 0.1,
-                transparent: true,
-                opacity: 0.18,
-                wireframe: false
-            }),
-            new THREE.MeshStandardMaterial({
-                color: 0x38bdf8,
-                roughness: 0.3,
-                metalness: 0.2,
-                transparent: true,
-                opacity: 0.16,
-                wireframe: true
-            })
-        ];
-
-        const numMeshes = isMobile ? 8 : 18;
-        for (let i = 0; i < numMeshes; i++) {
-            const geom = geometries[i % geometries.length];
-            const mat = meshMaterials[i % meshMaterials.length];
-            const mesh = new THREE.Mesh(geom, mat);
-
-            // Spread out in 3D space
-            mesh.position.x = (Math.random() - 0.5) * 70;
-            mesh.position.y = (Math.random() - 0.5) * 50;
-            mesh.position.z = (Math.random() - 0.5) * 30 - 5;
-
-            // Random initial rotation & scale
-            mesh.rotation.x = Math.random() * Math.PI;
-            mesh.rotation.y = Math.random() * Math.PI;
-            const scale = 0.6 + Math.random() * 0.7;
-            mesh.scale.set(scale, scale, scale);
-
-            // Custom speeds for floating motion
-            mesh.userData = {
-                rotSpeedX: (Math.random() - 0.5) * 0.006,
-                rotSpeedY: (Math.random() - 0.5) * 0.008,
-                floatSpeed: 0.001 + Math.random() * 0.0015,
-                floatOffset: Math.random() * Math.PI * 2,
-                initialY: mesh.position.y
-            };
-
-            meshGroup.add(mesh);
-        }
-        scene.add(meshGroup);
-
-        // 6. Create Subtle Ambient Star/Node Particles
-        const particleCount = isMobile ? 60 : 160;
+        // 4. Initialize Node Positions and Velocities
         const particleGeo = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
+        const posArray = new Float32Array(NODE_COUNT * 3);
 
-        const colorPalette = [
-            new THREE.Color(0x38bdf8), // Sky Blue
-            new THREE.Color(0x3b82f6), // Electric Blue
-            new THREE.Color(0x10b981), // Emerald Green
-            new THREE.Color(0x34d399), // Mint Glow
-            new THREE.Color(0x6366f1)  // Indigo
-        ];
+        for (let i = 0; i < NODE_COUNT; i++) {
+            const x = (Math.random() - 0.5) * 60;
+            const y = (Math.random() - 0.5) * 45;
+            const z = (Math.random() - 0.5) * 20 - 5;
 
-        for (let i = 0; i < particleCount; i++) {
-            const i3 = i * 3;
-            positions[i3] = (Math.random() - 0.5) * 90;
-            positions[i3 + 1] = (Math.random() - 0.5) * 70;
-            positions[i3 + 2] = (Math.random() - 0.5) * 40 - 10;
+            posArray[i * 3] = x;
+            posArray[i * 3 + 1] = y;
+            posArray[i * 3 + 2] = z;
 
-            const c = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-            colors[i3] = c.r;
-            colors[i3 + 1] = c.g;
-            colors[i3 + 2] = c.b;
+            nodePositions.push(new THREE.Vector3(x, y, z));
+            nodeVelocities.push(new THREE.Vector3(
+                (Math.random() - 0.5) * 0.03,
+                (Math.random() - 0.5) * 0.03,
+                (Math.random() - 0.5) * 0.02
+            ));
         }
 
-        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
+        // Subtle Academic Slate / Blue Point Material
         const particleMat = new THREE.PointsMaterial({
-            size: isMobile ? 1.8 : 2.4,
-            vertexColors: true,
+            color: 0x3b82f6,
+            size: isMobile ? 2.0 : 2.6,
             transparent: true,
-            opacity: 0.35,
+            opacity: 0.28,
             sizeAttenuation: true
         });
 
         particleSystem = new THREE.Points(particleGeo, particleMat);
         scene.add(particleSystem);
 
-        // 7. Event listeners
+        // Connecting Line Segments Geometry
+        const lineGeo = new THREE.BufferGeometry();
+        const maxLines = (NODE_COUNT * (NODE_COUNT - 1)) / 2;
+        const linePositions = new Float32Array(maxLines * 6);
+        lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3).setUsage(THREE.DynamicDrawUsage));
+
+        const lineMat = new THREE.LineBasicMaterial({
+            color: 0x94a3b8,
+            transparent: true,
+            opacity: 0.12,
+            blending: THREE.NormalBlending
+        });
+
+        lineSegments = new THREE.LineSegments(lineGeo, lineMat);
+        scene.add(lineSegments);
+
+        // 5. Event listeners
         window.addEventListener('resize', onWindowResize, { passive: true });
         if (!isMobile) {
             window.addEventListener('mousemove', onMouseMove, { passive: true });
         }
 
-        // 8. Start loop or single render
+        // 6. Animation loop
         if (prefersReducedMotion) {
+            updatePositions();
             renderer.render(scene, camera);
         } else {
             animate();
@@ -184,8 +115,8 @@
     }
 
     function onMouseMove(event) {
-        mouseX = (event.clientX - width / 2) * 0.015;
-        mouseY = (event.clientY - height / 2) * 0.015;
+        mouseX = (event.clientX - width / 2) * 0.01;
+        mouseY = (event.clientY - height / 2) * 0.01;
     }
 
     function onWindowResize() {
@@ -201,37 +132,64 @@
         }
     }
 
-    function animate(timestamp) {
+    function updatePositions() {
+        const positions = particleSystem.geometry.attributes.position.array;
+        const linePos = lineSegments.geometry.attributes.position.array;
+        let lineIdx = 0;
+
+        for (let i = 0; i < NODE_COUNT; i++) {
+            const pos = nodePositions[i];
+            const vel = nodeVelocities[i];
+
+            pos.add(vel);
+
+            // Bounce gently on boundaries
+            if (pos.x < -35 || pos.x > 35) vel.x *= -1;
+            if (pos.y < -28 || pos.y > 28) vel.y *= -1;
+            if (pos.z < -20 || pos.z > 5) vel.z *= -1;
+
+            positions[i * 3] = pos.x;
+            positions[i * 3 + 1] = pos.y;
+            positions[i * 3 + 2] = pos.z;
+
+            // Connect nearby nodes
+            for (let j = i + 1; j < NODE_COUNT; j++) {
+                const posB = nodePositions[j];
+                const dist = pos.distanceTo(posB);
+
+                if (dist < MAX_DISTANCE) {
+                    linePos[lineIdx++] = pos.x;
+                    linePos[lineIdx++] = pos.y;
+                    linePos[lineIdx++] = pos.z;
+                    linePos[lineIdx++] = posB.x;
+                    linePos[lineIdx++] = posB.y;
+                    linePos[lineIdx++] = posB.z;
+                }
+            }
+        }
+
+        particleSystem.geometry.attributes.position.needsUpdate = true;
+        lineSegments.geometry.setDrawRange(0, lineIdx / 3);
+        lineSegments.geometry.attributes.position.needsUpdate = true;
+    }
+
+    function animate() {
         animationFrameId = requestAnimationFrame(animate);
 
-        const time = (timestamp || 0) * 0.001;
+        // Smooth camera parallax
+        targetX += (mouseX - targetX) * 0.03;
+        targetY += (mouseY - targetY) * 0.03;
 
-        // Smooth mouse parallax lerp
-        targetX += (mouseX - targetX) * 0.04;
-        targetY += (mouseY - targetY) * 0.04;
+        camera.position.x = targetX * 1.5;
+        camera.position.y = -targetY * 1.5;
+        camera.lookAt(scene.position);
 
-        if (meshGroup) {
-            meshGroup.position.x = targetX * 1.5;
-            meshGroup.position.y = -targetY * 1.5;
-
-            meshGroup.children.forEach((mesh) => {
-                mesh.rotation.x += mesh.userData.rotSpeedX;
-                mesh.rotation.y += mesh.userData.rotSpeedY;
-                mesh.position.y = mesh.userData.initialY + Math.sin(time * 0.8 + mesh.userData.floatOffset) * 1.2;
-            });
-        }
-
-        if (particleSystem) {
-            particleSystem.rotation.y = time * 0.02;
-            particleSystem.rotation.x = Math.sin(time * 0.01) * 0.05;
-            particleSystem.position.x = targetX * 0.6;
-            particleSystem.position.y = -targetY * 0.6;
-        }
+        updatePositions();
 
         renderer.render(scene, camera);
     }
 
-    // Cleanup helper
+    // Export clean dispose helper
     window.AttendXThree = {
         dispose: function () {
             if (animationFrameId) {
@@ -245,7 +203,6 @@
         }
     };
 
-    // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
