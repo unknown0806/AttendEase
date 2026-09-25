@@ -1,11 +1,12 @@
 from functools import wraps
 from flask import session, redirect, url_for, flash, request, jsonify
+from db import db
 from models import User
 
 def get_current_user():
     user_id = session.get('user_id')
     if user_id:
-        return User.query.get(user_id)
+        return db.session.get(User, user_id)
     return None
 
 def login_required(f):

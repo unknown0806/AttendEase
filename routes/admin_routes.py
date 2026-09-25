@@ -366,6 +366,45 @@ def assign_teacher(teacher_id):
     flash(f'Teacher "{teacher.name}" assigned to class and subject successfully!', 'success')
     return redirect(url_for('admin.manage_teachers'))
 
+@admin_bp.route('/teachers/assign', methods=['POST'])
+@admin_bp.route('/teachers/assign-bulk', methods=['POST'])
+@role_required('admin')
+def assign_teacher_bulk():
+    teacher_id = request.form.get('teacher_id', type=int)
+    class_id = request.form.get('class_id', type=int)
+    subject_id = request.form.get('subject_id', type=int)
+
+    if not teacher_id or not class_id or not subject_id:
+        flash('Please select a teacher, class, and subject.', 'danger')
+        return redirect(url_for('admin.manage_teachers'))
+
+    teacher = User.query.filter_by(user_id=teacher_id, role='teacher').first_or_404()
+
+    existing = TeacherSubject.query.filter_by(
+        teacher_id=teacher_id,
+        class_id=class_id,
+        subject_id=subject_id
+    ).first()
+
+    if existing:
+        flash('This teacher is already assigned to this class and subject.', 'warning')
+        return redirect(url_for('admin.manage_teachers'))
+
+    cs = ClassSubject.query.filter_by(class_id=class_id, subject_id=subject_id).first()
+    if not cs:
+        db.session.add(ClassSubject(class_id=class_id, subject_id=subject_id))
+
+    assignment = TeacherSubject(
+        teacher_id=teacher_id,
+        class_id=class_id,
+        subject_id=subject_id
+    )
+    db.session.add(assignment)
+    db.session.commit()
+
+    flash(f'Faculty "{teacher.name}" successfully assigned to class and subject!', 'success')
+    return redirect(url_for('admin.manage_teachers'))
+
 @admin_bp.route('/teachers/<int:teacher_id>/deactivate', methods=['POST'])
 @role_required('admin')
 def toggle_teacher_active(teacher_id):

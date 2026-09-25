@@ -6,7 +6,7 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'user_id' in session:
+    if request.method == 'GET' and 'user_id' in session:
         role = session.get('role')
         if role == 'teacher':
             return redirect(url_for('teacher.dashboard'))

@@ -74,7 +74,7 @@ def api_teacher_students():
     if not class_id:
         return jsonify({'error': 'class_id query parameter required'}), 400
 
-    target_class = Class.query.get(class_id)
+    target_class = db.session.get(Class, class_id)
     if not target_class:
         return jsonify({'error': 'class not found'}), 404
 
@@ -401,7 +401,7 @@ def api_admin_assign_teacher(teacher_id):
     if not subject_id or not class_id:
         return jsonify({'error': 'subject_id and class_id are required'}), 400
 
-    if not Subject.query.get(subject_id) or not Class.query.get(class_id):
+    if not db.session.get(Subject, subject_id) or not db.session.get(Class, class_id):
         return jsonify({'error': 'subject or class not found'}), 404
 
     existing = TeacherSubject.query.filter_by(
@@ -487,12 +487,12 @@ def api_admin_create_subject():
 @api_bp.route('/admin/classes/<int:class_id>/subjects', methods=['POST'])
 @role_required('admin')
 def api_admin_assign_subject_to_class(class_id):
-    if not Class.query.get(class_id):
+    if not db.session.get(Class, class_id):
         return jsonify({'error': 'class not found'}), 404
 
     data = request.get_json(silent=True) or {}
     subject_id = data.get('subject_id')
-    if not subject_id or not Subject.query.get(subject_id):
+    if not subject_id or not db.session.get(Subject, subject_id):
         return jsonify({'error': 'subject not found'}), 404
 
     if ClassSubject.query.filter_by(class_id=class_id, subject_id=subject_id).first():
@@ -562,7 +562,7 @@ def api_admin_get_attendance():
 @api_bp.route('/admin/attendance/<int:attendance_id>', methods=['GET'])
 @role_required('admin')
 def api_admin_get_single_attendance(attendance_id):
-    r = Attendance.query.get(attendance_id)
+    r = db.session.get(Attendance, attendance_id)
     if not r:
         return jsonify({'error': 'attendance record not found'}), 404
 
@@ -580,7 +580,7 @@ def api_admin_get_single_attendance(attendance_id):
 @api_bp.route('/admin/attendance/<int:attendance_id>/correct', methods=['PATCH'])
 @role_required('admin')
 def api_admin_correct_attendance(attendance_id):
-    r = Attendance.query.get(attendance_id)
+    r = db.session.get(Attendance, attendance_id)
     if not r:
         return jsonify({'error': 'attendance record not found'}), 404
 
@@ -604,7 +604,7 @@ def api_admin_correct_attendance(attendance_id):
         old_status=old_status,
         new_status=new_status,
         reason=reason,
-        corrected_at=datetime.utcnow()
+        corrected_at=datetime.now()
     )
     db.session.add(correction)
     r.status = new_status
@@ -621,7 +621,7 @@ def api_admin_correct_attendance(attendance_id):
 @api_bp.route('/admin/attendance/<int:attendance_id>/corrections', methods=['GET'])
 @role_required('admin')
 def api_admin_get_corrections(attendance_id):
-    r = Attendance.query.get(attendance_id)
+    r = db.session.get(Attendance, attendance_id)
     if not r:
         return jsonify({'error': 'attendance record not found'}), 404
 

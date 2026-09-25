@@ -123,7 +123,7 @@ class AttendXTestCase(unittest.TestCase):
         self.assertEqual(edit_res.status_code, 200)
 
         with self.app.app_context():
-            updated_stu = Student.query.get(stu_id)
+            updated_stu = db.session.get(Student, stu_id)
             self.assertEqual(updated_stu.user.photo_url, 'https://example.com/custom_photo.jpg')
     def test_admin_mandatory_reason_correction_and_relock(self):
         # Login as Admin Priya
@@ -151,7 +151,7 @@ class AttendXTestCase(unittest.TestCase):
 
         # 3. Verify in DB: status updated, locked=True, and audit row added
         with self.app.app_context():
-            updated_att = Attendance.query.get(att_id)
+            updated_att = db.session.get(Attendance, att_id)
             self.assertEqual(updated_att.status, 'present')
             self.assertTrue(updated_att.locked)
 

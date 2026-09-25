@@ -535,11 +535,13 @@ window.AttendXAnim = (function () {
     function initPageTransitions() {
         if (prefersReducedMotion || typeof gsap === 'undefined') return;
 
-        // Intercept internal ERP links
-        document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([href^="javascript"]):not(.no-page-anim)').forEach(link => {
+        // Intercept internal ERP navigation links safely
+        document.querySelectorAll('a[href]:not([target="_blank"]):not([href^="#"]):not([href^="javascript"]):not([data-bs-toggle]):not([data-bs-target]):not([download]):not(.no-page-anim)').forEach(link => {
             link.addEventListener('click', (e) => {
+                if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0) return;
+
                 const targetUrl = link.getAttribute('href');
-                if (!targetUrl || targetUrl.startsWith('#') || targetUrl.includes('/logout')) return;
+                if (!targetUrl || targetUrl.startsWith('#') || targetUrl.includes('/logout') || targetUrl.startsWith('mailto:') || targetUrl.startsWith('tel:')) return;
 
                 // Animate main container out quickly
                 const main = document.querySelector('main.app-container');

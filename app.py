@@ -62,7 +62,35 @@ def create_app(config_class=Config):
 
     return app
 
+def get_local_ipv4():
+    """Retrieve the local IPv4 address of this machine for network access."""
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.settimeout(0.5)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except Exception:
+            return '127.0.0.1'
+
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    host = os.getenv('HOST', '0.0.0.0')
+    port = int(os.getenv('PORT', 5000))
+    debug = os.getenv('DEBUG', 'True').lower() in ('true', '1', 't')
+    local_ip = get_local_ipv4()
+
+    print("\n" + "=" * 65)
+    print("  AttendX Campus ERP is Running!")
+    print(f"  * Local Access:       http://localhost:{port} (or http://127.0.0.1:{port})")
+    print(f"  * IPv4 Network Link:  http://{local_ip}:{port}")
+    print("  * Access from any phone/laptop on the same Wi-Fi network!")
+    print("=" * 65 + "\n")
+
+    app.run(host=host, port=port, debug=debug)
 
