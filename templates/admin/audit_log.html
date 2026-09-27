@@ -27,8 +27,16 @@
                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ corrections|length }} Overrides</span>
             </div>
 
+            <!-- Instant Live Search Bar -->
+            <div class="mb-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="auditSearchInput" class="form-control border-start-0 ps-0" placeholder="Search audit trail by student, roll no, subject, reason or admin...">
+                </div>
+            </div>
+
             {% if corrections %}
-                <div class="list-group list-group-flush">
+                <div id="auditList" class="list-group list-group-flush">
                     {% for c in corrections %}
                         <div class="list-group-item px-0 py-3 border-bottom">
                             <div class="d-flex justify-content-between align-items-start mb-1">
@@ -63,4 +71,14 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.AttendXAnim) {
+            AttendXAnim.initTableSearch('auditSearchInput', '#auditList .list-group-item');
+        }
+    });
+</script>
 {% endblock %}

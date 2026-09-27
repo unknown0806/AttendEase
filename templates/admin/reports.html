@@ -27,8 +27,16 @@
                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle" data-counter data-target="{{ shortage_list|length }}">{{ shortage_list|length }} At Risk</span>
             </div>
 
+            <!-- Instant Live Search Bar -->
+            <div class="mb-3">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                    <input type="text" id="shortageSearchInput" class="form-control border-start-0 ps-0" placeholder="Search shortage list by student name, roll no, email, or class...">
+                </div>
+            </div>
+
             {% if shortage_list %}
-                <div class="list-group list-group-flush">
+                <div id="shortageList" class="list-group list-group-flush">
                     {% for item in shortage_list %}
                         <div class="list-group-item px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
                             <div>
@@ -68,6 +76,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         if (window.AttendXCharts) {
             AttendXCharts.adminDonut('complianceChart', 82, {{ shortage_list|length * 6 if shortage_list|length > 0 else 18 }});
+        }
+        if (window.AttendXAnim) {
+            AttendXAnim.initTableSearch('shortageSearchInput', '#shortageList .list-group-item');
         }
     });
 </script>
