@@ -28,37 +28,38 @@ def seed_database():
             photo_url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
             active=True
         )
-        admin.set_password("admin123")
+        admin.set_password("attendease12345")
         db.session.add(admin)
+        db.session.commit()
 
         # 2. Faculty / Teachers (5 Members)
         teachers_data = [
             (
-                "Suresh Kumar", "suresh@college.edu", "teacher123",
+                "Suresh Kumar", "suresh@college.edu", "attendease12345",
                 "+91 98265 11223", "12 Professors Colony, Old Palasia, Indore, MP",
                 "Computer Science & Engineering", "HOD & Associate Professor", "Ph.D. (CSE), M.Tech (Software Engg)",
                 "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80"
             ),
             (
-                "Meera Patel", "meera@college.edu", "teacher123",
+                "Meera Patel", "meera@college.edu", "attendease12345",
                 "+91 98265 22334", "45 Saket Nagar, Main Road, Indore, MP",
                 "Information Technology", "Assistant Professor", "M.Tech (Network Systems), B.E.",
                 "https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=150&auto=format&fit=crop&q=80"
             ),
             (
-                "Dr. Rajesh Iyer", "rajesh@college.edu", "teacher123",
+                "Dr. Rajesh Iyer", "rajesh@college.edu", "attendease12345",
                 "+91 98265 33445", "78 Silver Springs, AB Road, Indore, MP",
                 "Data Science & Artificial Intelligence", "Senior Professor", "Ph.D. (AI & Cloud Computing), M.S.",
                 "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
             ),
             (
-                "Ananya Sen", "ananya@college.edu", "teacher123",
+                "Ananya Sen", "ananya@college.edu", "attendease12345",
                 "+91 98265 44556", "23 Geeta Bhawan Square, Indore, MP",
                 "Software Engineering", "Assistant Professor", "MCA, B.Sc (Computer Science)",
                 "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&auto=format&fit=crop&q=80"
             ),
             (
-                "Vikram Malhotra", "vikram@college.edu", "teacher123",
+                "Vikram Malhotra", "vikram@college.edu", "attendease12345",
                 "+91 98265 55667", "66 Annapurna Road, Sector C, Indore, MP",
                 "Computer Networks & Security", "Senior Lecturer", "M.Sc (Cyber Security), CCNA",
                 "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
@@ -310,7 +311,7 @@ def seed_database():
                 photo_url=photo,
                 active=True
             )
-            stu_u.set_password("student123")
+            stu_u.set_password("attendease12345")
             db.session.add(stu_u)
             db.session.flush()
 
@@ -492,15 +493,15 @@ def seed_database():
         print("DATABASE SEEDED SUCCESSFULLY WITH 23 STUDENTS & 5 FACULTY MEMBERS!")
         print("==========================================")
         print("\n=== Demo Logins ===")
-        print("Admin:   priya@college.edu   / admin123")
-        print("Teacher: suresh@college.edu  / teacher123 (DBMS, Python)")
-        print("Teacher: meera@college.edu   / teacher123 (Computer Networks)")
-        print("Teacher: rajesh@college.edu  / teacher123 (Cloud Computing)")
-        print("Teacher: ananya@college.edu  / teacher123 (Data Structures)")
-        print("Student: rahul@student.edu   / student123 (BCA 3A - Shortage Alert)")
-        print("Student: anita@student.edu   / student123 (BCA 3A - High Attendance)")
-        print("Student: pooja@student.edu   / student123 (BCA 3B)")
-        print("Student: kavita@student.edu  / student123 (MCA 1A)")
+        print("Admin:   priya@college.edu   / attendease12345")
+        print("Teacher: suresh@college.edu  / attendease12345 (DBMS, Python)")
+        print("Teacher: meera@college.edu   / attendease12345 (Computer Networks)")
+        print("Teacher: rajesh@college.edu  / attendease12345 (Cloud Computing)")
+        print("Teacher: ananya@college.edu  / attendease12345 (Data Structures)")
+        print("Student: rahul@student.edu   / attendease12345 (BCA 3A - Shortage Alert)")
+        print("Student: anita@student.edu   / attendease12345 (BCA 3A - High Attendance)")
+        print("Student: pooja@student.edu   / attendease12345 (BCA 3B)")
+        print("Student: kavita@student.edu  / attendease12345 (MCA 1A)")
         print("==========================================\n")
 
 if __name__ == "__main__":

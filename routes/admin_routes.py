@@ -63,7 +63,7 @@ def manage_students():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
-        password = request.form.get('password', 'student123').strip()
+        password = request.form.get('password', 'attendease12345').strip()
         roll_no = request.form.get('roll_no', '').strip()
         class_id = request.form.get('class_id', type=int)
         phone = request.form.get('phone', '').strip()
@@ -109,7 +109,7 @@ def manage_students():
                 photo_url=final_photo,
                 active=True
             )
-            new_user.set_password(password if password else 'student123')
+            new_user.set_password(password if password else 'attendease12345')
             db.session.add(new_user)
             db.session.flush() # populate user_id
 
@@ -243,7 +243,7 @@ def manage_teachers():
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip()
-        password = request.form.get('password', 'teacher123').strip()
+        password = request.form.get('password', 'attendease12345').strip()
         phone = request.form.get('phone', '').strip()
         address = request.form.get('address', '').strip()
         department = request.form.get('department', '').strip()
@@ -280,7 +280,7 @@ def manage_teachers():
             photo_url=final_photo,
             active=True
         )
-        new_teacher.set_password(password if password else 'teacher123')
+        new_teacher.set_password(password if password else 'attendease12345')
         db.session.add(new_teacher)
         db.session.commit()
 
