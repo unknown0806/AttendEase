@@ -264,9 +264,17 @@
                                                 <div class="col-12"><hr class="my-1 text-muted"></div>
                                                 <div class="col-12"><h6 class="fw-bold text-primary mb-0 small text-uppercase">Academic &amp; Student Info</h6></div>
 
-                                                <div class="col-12 col-md-4">
+                                                <div class="col-12 col-md-6">
                                                     <label class="form-label small fw-bold">Full Name *</label>
                                                     <input type="text" name="name" class="form-control" value="{{ stu.user.name }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label small fw-bold">Official Email *</label>
+                                                    <input type="email" name="email" class="form-control" value="{{ stu.user.email }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">New Password</label>
+                                                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
                                                 </div>
                                                 <div class="col-12 col-md-4">
                                                     <label class="form-label small fw-bold">Roll Number *</label>

@@ -282,14 +282,37 @@ def api_admin_edit_student(student_id):
 
     data = request.get_json(silent=True) or {}
     name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
     roll_no = data.get('roll_no')
     class_id = data.get('class_id')
+    phone = data.get('phone')
+    address = data.get('address')
+    father_name = data.get('father_name')
+    mother_name = data.get('mother_name')
+    father_phone = data.get('father_phone')
+    mother_phone = data.get('mother_phone')
+    dob = data.get('dob')
+    gender = data.get('gender')
+    blood_group = data.get('blood_group')
     photo_url = data.get('photo_url')
 
     if name is not None:
         student.user.name = name.strip()
+    if email is not None:
+        email = email.strip()
+        existing_email = User.query.filter(User.email == email, User.user_id != student.user_id).first()
+        if existing_email:
+            return jsonify({'error': 'email already in use'}), 409
+        student.user.email = email
+    if password:
+        student.user.set_password(password.strip())
+    if phone is not None:
+        student.user.phone = phone.strip() if phone else None
+    if address is not None:
+        student.user.address = address.strip() if address else None
     if photo_url is not None:
-        student.user.photo_url = photo_url.strip()
+        student.user.photo_url = photo_url.strip() if photo_url else None
     if roll_no is not None:
         roll_no = roll_no.strip()
         existing = Student.query.filter(Student.roll_no == roll_no, Student.student_id != student_id).first()
@@ -301,6 +324,20 @@ def api_admin_edit_student(student_id):
         if not target_class:
             return jsonify({'error': 'class_id not found'}), 404
         student.class_id = class_id
+    if father_name is not None:
+        student.father_name = father_name.strip() if father_name else None
+    if mother_name is not None:
+        student.mother_name = mother_name.strip() if mother_name else None
+    if father_phone is not None:
+        student.father_phone = father_phone.strip() if father_phone else None
+    if mother_phone is not None:
+        student.mother_phone = mother_phone.strip() if mother_phone else None
+    if dob is not None:
+        student.dob = dob.strip() if dob else None
+    if gender is not None:
+        student.gender = gender.strip() if gender else None
+    if blood_group is not None:
+        student.blood_group = blood_group.strip() if blood_group else None
 
     db.session.commit()
     return jsonify({'message': 'student updated'}), 200
@@ -372,18 +409,36 @@ def api_admin_edit_teacher(teacher_id):
     data = request.get_json(silent=True) or {}
     name = data.get('name')
     email = data.get('email')
+    password = data.get('password')
+    phone = data.get('phone')
+    address = data.get('address')
+    department = data.get('department')
+    designation = data.get('designation')
+    qualification = data.get('qualification')
     photo_url = data.get('photo_url')
 
     if name is not None:
         teacher.name = name.strip()
-    if photo_url is not None:
-        teacher.photo_url = photo_url.strip()
     if email is not None:
         email = email.strip()
         existing = User.query.filter(User.email == email, User.user_id != teacher_id).first()
         if existing:
             return jsonify({'error': 'email already in use'}), 409
         teacher.email = email
+    if password:
+        teacher.set_password(password.strip())
+    if phone is not None:
+        teacher.phone = phone.strip() if phone else None
+    if address is not None:
+        teacher.address = address.strip() if address else None
+    if department is not None:
+        teacher.department = department.strip() if department else None
+    if designation is not None:
+        teacher.designation = designation.strip() if designation else None
+    if qualification is not None:
+        teacher.qualification = qualification.strip() if qualification else None
+    if photo_url is not None:
+        teacher.photo_url = photo_url.strip() if photo_url else None
 
     db.session.commit()
     return jsonify({'message': 'teacher updated'}), 200

@@ -105,26 +105,60 @@ class AttendXTestCase(unittest.TestCase):
         self.assertIn(b'Shortage Alert', att_page.data)
         self.assertIn(b'Attend next', att_page.data)
 
-    def test_admin_photo_management(self):
+    def test_admin_student_and_teacher_edit(self):
         # Login as Admin
         self.client.post('/login', data={'email': 'priya@college.edu', 'password': 'admin123'})
 
-        # Update student photo via URL
+        # Test full editing of student details (email, password, roll_no, etc.)
         with self.app.app_context():
             stu = Student.query.first()
             stu_id = stu.student_id
 
-        edit_res = self.client.post(f'/admin/students/{stu_id}/edit', data={
+        edit_stu_res = self.client.post(f'/admin/students/{stu_id}/edit', data={
             'name': 'Rahul Sharma Updated',
+            'email': 'rahul.newemail@student.edu',
+            'password': 'newstudentpass123',
             'roll_no': 'BCA21',
             'class_id': 1,
+            'phone': '+91 99999 88888',
+            'father_name': 'New Father Name',
             'photo_url': 'https://example.com/custom_photo.jpg'
         }, follow_redirects=True)
-        self.assertEqual(edit_res.status_code, 200)
+        self.assertEqual(edit_stu_res.status_code, 200)
 
         with self.app.app_context():
             updated_stu = db.session.get(Student, stu_id)
+            self.assertEqual(updated_stu.user.name, 'Rahul Sharma Updated')
+            self.assertEqual(updated_stu.user.email, 'rahul.newemail@student.edu')
+            self.assertTrue(updated_stu.user.check_password('newstudentpass123'))
+            self.assertEqual(updated_stu.user.phone, '+91 99999 88888')
+            self.assertEqual(updated_stu.father_name, 'New Father Name')
             self.assertEqual(updated_stu.user.photo_url, 'https://example.com/custom_photo.jpg')
+
+        # Test full editing of teacher details (email, password, department, designation, etc.)
+        with self.app.app_context():
+            teacher = User.query.filter_by(role='teacher').first()
+            teacher_id = teacher.user_id
+
+        edit_teacher_res = self.client.post(f'/admin/teachers/{teacher_id}/edit', data={
+            'name': 'Dr. Suresh Kumar Updated',
+            'email': 'suresh.newemail@college.edu',
+            'password': 'newteacherpass123',
+            'phone': '+91 88888 77777',
+            'department': 'Advanced Computer Applications',
+            'designation': 'Senior Professor',
+            'qualification': 'Ph.D. CS',
+            'address': 'Campus Quarter A'
+        }, follow_redirects=True)
+        self.assertEqual(edit_teacher_res.status_code, 200)
+
+        with self.app.app_context():
+            updated_teacher = db.session.get(User, teacher_id)
+            self.assertEqual(updated_teacher.name, 'Dr. Suresh Kumar Updated')
+            self.assertEqual(updated_teacher.email, 'suresh.newemail@college.edu')
+            self.assertTrue(updated_teacher.check_password('newteacherpass123'))
+            self.assertEqual(updated_teacher.department, 'Advanced Computer Applications')
+            self.assertEqual(updated_teacher.designation, 'Senior Professor')
     def test_admin_mandatory_reason_correction_and_relock(self):
         # Login as Admin Priya
         self.client.post('/login', data={'email': 'priya@college.edu', 'password': 'admin123'})

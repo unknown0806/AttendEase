@@ -162,6 +162,8 @@ def manage_students():
 def edit_student(student_id):
     student = Student.query.get_or_404(student_id)
     name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
     roll_no = request.form.get('roll_no', '').strip()
     class_id = request.form.get('class_id', type=int)
     phone = request.form.get('phone', '').strip()
@@ -179,6 +181,17 @@ def edit_student(student_id):
     if not name or not roll_no or not class_id:
         flash('Name, roll number, and class are required.', 'danger')
         return redirect(url_for('admin.manage_students'))
+
+    # Check email conflict
+    if email:
+        existing_email = User.query.filter(User.email == email, User.user_id != student.user_id).first()
+        if existing_email:
+            flash('Email already registered to another user.', 'danger')
+            return redirect(url_for('admin.manage_students'))
+        student.user.email = email
+
+    if password:
+        student.user.set_password(password)
 
     # Check roll_no conflict
     existing = Student.query.filter(Student.roll_no == roll_no, Student.student_id != student_id).first()
@@ -293,6 +306,7 @@ def edit_teacher(teacher_id):
     teacher = User.query.filter_by(user_id=teacher_id, role='teacher').first_or_404()
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip()
+    password = request.form.get('password', '').strip()
     phone = request.form.get('phone', '').strip()
     address = request.form.get('address', '').strip()
     department = request.form.get('department', '').strip()
@@ -310,6 +324,9 @@ def edit_teacher(teacher_id):
         flash('Email already used by another user.', 'danger')
         return redirect(url_for('admin.manage_teachers'))
 
+    if password:
+        teacher.set_password(password)
+
     saved_file = save_avatar_file(photo_file, prefix=f"faculty_{teacher_id}")
     if saved_file:
         teacher.photo_url = saved_file
@@ -326,6 +343,16 @@ def edit_teacher(teacher_id):
     db.session.commit()
 
     flash(f'Faculty "{name}" profile updated successfully.', 'success')
+    return redirect(url_for('admin.manage_teachers'))
+
+@admin_bp.route('/teachers/assignments/<int:assignment_id>/delete', methods=['POST'])
+@role_required('admin')
+def delete_teacher_assignment(assignment_id):
+    assignment = TeacherSubject.query.get_or_404(assignment_id)
+    teacher_name = assignment.teacher.name if assignment.teacher else "Faculty"
+    db.session.delete(assignment)
+    db.session.commit()
+    flash(f'Mapping removed for {teacher_name}.', 'info')
     return redirect(url_for('admin.manage_teachers'))
 
 @admin_bp.route('/teachers/<int:teacher_id>/assign', methods=['POST'])
