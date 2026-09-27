@@ -509,11 +509,12 @@ window.AttendXAnim = (function () {
 
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.toLowerCase().trim();
+            const tokens = query.split(/\s+/).filter(Boolean);
             const rows = document.querySelectorAll(targetRowsSelector);
 
             rows.forEach(row => {
                 const text = row.textContent.toLowerCase();
-                const matches = text.includes(query);
+                const matches = tokens.length === 0 || tokens.every(token => text.includes(token));
 
                 if (matches) {
                     if (row.style.display === 'none') {
