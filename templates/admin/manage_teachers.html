@@ -76,10 +76,13 @@
                                             <span>&bull; <i class="bi bi-telephone text-secondary me-1"></i>{{ t.phone }}</span>
                                         {% endif %}
                                     </div>
-                                    <div class="d-flex flex-wrap gap-1 mt-1.5">
+                                    <div class="d-flex flex-wrap gap-1 mt-1.5 align-items-center">
                                         {% for a in t.teacher_assignments %}
-                                            <span class="badge bg-primary-subtle text-primary border" style="font-size: 0.7rem;">
-                                                {{ a.class_obj.class_name }}: {{ a.subject.subject_name }}
+                                            <span class="badge bg-primary-subtle text-primary border d-inline-flex align-items-center gap-1" style="font-size: 0.7rem;">
+                                                <span>{{ a.class_obj.class_name }}: {{ a.subject.subject_name }}</span>
+                                                <form method="POST" action="{{ url_for('admin.delete_teacher_assignment', assignment_id=a.id) }}" class="d-inline" onsubmit="return confirm('Remove this class/subject mapping?');">
+                                                    <button type="submit" class="btn-close btn-close-white" style="font-size: 0.5rem;" title="Remove mapping"></button>
+                                                </form>
                                             </span>
                                         {% endfor %}
                                     </div>
@@ -171,7 +174,14 @@
                                                             {% for a in t.teacher_assignments %}
                                                                 <li class="list-group-item bg-transparent px-0 py-1.5 d-flex justify-content-between align-items-center">
                                                                     <span>{{ a.subject.subject_name }}</span>
-                                                                    <span class="badge bg-primary-subtle text-primary">{{ a.class_obj.class_name }}</span>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <span class="badge bg-primary-subtle text-primary">{{ a.class_obj.class_name }}</span>
+                                                                        <form method="POST" action="{{ url_for('admin.delete_teacher_assignment', assignment_id=a.id) }}" class="d-inline" onsubmit="return confirm('Remove this class/subject mapping?');">
+                                                                            <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Remove mapping">
+                                                                                <i class="bi bi-trash"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </div>
                                                                 </li>
                                                             {% endfor %}
                                                         </ul>
@@ -229,13 +239,17 @@
                                                     <input type="url" name="photo_url" class="form-control form-control-sm" placeholder="https://..." value="{{ t.photo_url or '' }}">
                                                 </div>
 
-                                                <div class="col-12 col-md-6">
+                                                <div class="col-12 col-md-4">
                                                     <label class="form-label small fw-bold">Full Name *</label>
                                                     <input type="text" name="name" class="form-control" value="{{ t.name }}" required>
                                                 </div>
-                                                <div class="col-12 col-md-6">
+                                                <div class="col-12 col-md-4">
                                                     <label class="form-label small fw-bold">Email Address *</label>
                                                     <input type="email" name="email" class="form-control" value="{{ t.email }}" required>
+                                                </div>
+                                                <div class="col-12 col-md-4">
+                                                    <label class="form-label small fw-bold">New Password</label>
+                                                    <input type="password" name="password" class="form-control" placeholder="Leave blank to keep current">
                                                 </div>
 
                                                 <div class="col-12 col-md-4">
