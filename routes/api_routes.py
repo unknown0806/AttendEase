@@ -1,5 +1,6 @@
 from datetime import datetime, date
 from flask import Blueprint, request, jsonify, session
+from sqlalchemy import func
 from db import db
 from models import (
     User, Class, Subject, ClassSubject, TeacherSubject,
@@ -14,14 +15,43 @@ api_bp = Blueprint('api', __name__)
 # ----------------------------------------------------
 @api_bp.route('/auth/login', methods=['POST'])
 def api_login():
-    data = request.get_json(silent=True) or {}
-    email = data.get('email', '').strip()
-    password = data.get('password', '')
+    data = request.get_json(silent=True) if request.is_json else (request.form or request.values or {})
+    
+    email = (
+        data.get('email') or 
+        data.get('email_address') or 
+        data.get('username') or 
+        data.get('user_id') or 
+        request.form.get('email') or 
+        request.values.get('email') or 
+        ''
+    ).strip()
+
+    password = (
+        data.get('password') or 
+        data.get('email_password') or 
+        data.get('emailPassword') or 
+        data.get('pass') or 
+        request.form.get('password') or 
+        request.form.get('email_password') or 
+        request.values.get('password') or 
+        request.values.get('email_password') or 
+        ''
+    )
 
     if not email or not password:
         return jsonify({'error': 'email and password required'}), 400
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(func.lower(User.email) == email.lower()).first()
+    if not user:
+        student = Student.query.filter(func.lower(Student.roll_no) == email.lower()).first()
+        if student and student.user:
+            user = student.user
+    if not user and email.isdigit():
+        user = db.session.get(User, int(email))
+    if not user:
+        user = User.query.filter_by(email=email).first()
+
     if not user or not user.check_password(password):
         return jsonify({'error': 'invalid email or password'}), 401
 
@@ -244,7 +274,7 @@ def api_admin_add_student():
     data = request.get_json(silent=True) or {}
     name = data.get('name', '').strip()
     email = data.get('email', '').strip()
-    password = data.get('password', 'temp123').strip()
+    password = (data.get('password') or data.get('email_password') or 'attendease12345').strip()
     roll_no = data.get('roll_no', '').strip()
     class_id = data.get('class_id')
     photo_url = data.get('photo_url')
@@ -283,7 +313,7 @@ def api_admin_edit_student(student_id):
     data = request.get_json(silent=True) or {}
     name = data.get('name')
     email = data.get('email')
-    password = data.get('password')
+    password = data.get('password') or data.get('email_password')
     roll_no = data.get('roll_no')
     class_id = data.get('class_id')
     phone = data.get('phone')
@@ -383,7 +413,7 @@ def api_admin_add_teacher():
     data = request.get_json(silent=True) or {}
     name = data.get('name', '').strip()
     email = data.get('email', '').strip()
-    password = data.get('password', 'temp123').strip()
+    password = (data.get('password') or data.get('email_password') or 'attendease12345').strip()
     photo_url = data.get('photo_url')
 
     if not name or not email:
@@ -409,7 +439,7 @@ def api_admin_edit_teacher(teacher_id):
     data = request.get_json(silent=True) or {}
     name = data.get('name')
     email = data.get('email')
-    password = data.get('password')
+    password = data.get('password') or data.get('email_password')
     phone = data.get('phone')
     address = data.get('address')
     department = data.get('department')

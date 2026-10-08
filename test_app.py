@@ -41,6 +41,54 @@ class AttendXTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn(b'Invalid email or password', resp.data)
 
+    def test_login_fetch_email_and_password_variations(self):
+        # 1. Whitespace & mixed case email
+        resp = self.client.post('/login', data={
+            'email': '  SURESH@College.Edu  ',
+            'password': 'teacher123'
+        }, follow_redirects=True)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(b'Suresh Kumar', resp.data)
+        self.client.get('/logout')
+
+        # 2. Login using email_password parameter
+        resp_email_pwd = self.client.post('/login', data={
+            'email': 'priya@college.edu',
+            'email_password': 'attendease12345'
+        }, follow_redirects=True)
+        self.assertEqual(resp_email_pwd.status_code, 200)
+        self.assertIn(b'Priya Rao', resp_email_pwd.data)
+        self.client.get('/logout')
+
+        # 3. Login using Student Roll No as User ID
+        resp_roll = self.client.post('/login', data={
+            'email': 'BCA21',
+            'password': 'student123'
+        }, follow_redirects=True)
+        self.assertEqual(resp_roll.status_code, 200)
+        self.assertIn(b'Rahul Sharma', resp_roll.data)
+        self.client.get('/logout')
+
+        # 4. JSON Login to /login
+        resp_json = self.client.post('/login', json={
+            'email': 'priya@college.edu',
+            'email_password': 'admin123'
+        })
+        self.assertEqual(resp_json.status_code, 200)
+        json_data = json.loads(resp_json.data)
+        self.assertEqual(json_data.get('role'), 'admin')
+        self.client.get('/logout')
+
+        # 5. API Login with email_password and form-encoded data
+        resp_api = self.client.post('/api/auth/login', data={
+            'email': 'suresh@college.edu',
+            'email_password': 'attendease12345'
+        })
+        self.assertEqual(resp_api.status_code, 200)
+        api_data = json.loads(resp_api.data)
+        self.assertEqual(api_data.get('role'), 'teacher')
+        self.client.post('/api/auth/logout')
+
     # ----------------------------------------------------
     # 2. Teacher Attendance & Submit-and-Lock Tests
     # ----------------------------------------------------

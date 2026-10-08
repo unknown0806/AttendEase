@@ -18,12 +18,16 @@ def create_app(config_class=Config):
     # Initialize extensions
     db.init_app(app)
 
-    # Ensure database tables exist
+    # Ensure database tables exist and are seeded if empty
     with app.app_context():
         try:
             db.create_all()
+            from models import User
+            if not User.query.first():
+                from seed import seed_database
+                seed_database(app=app, drop_existing=False)
         except Exception as e:
-            app.logger.warning(f"Notice during db.create_all: {e}")
+            app.logger.warning(f"Notice during db initialization: {e}")
 
     # Context processor to inject current_user and user_role into all Jinja2 templates
     @app.context_processor

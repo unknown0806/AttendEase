@@ -30,7 +30,7 @@
             <div class="custom-input-group">
                 <label for="email" class="form-label small fw-semibold text-secondary mb-1">Email / User ID</label>
                 <div class="position-relative">
-                    <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="e.g. rahul@student.edu" autofocus>
+                    <input type="text" class="form-control" id="email" name="email" value="{{ email or '' }}" required placeholder="e.g. rahul@student.edu or BCA21" autocomplete="username" autofocus>
                     <span class="input-icon"><i class="bi bi-person text-muted"></i></span>
                 </div>
             </div>
@@ -39,7 +39,7 @@
             <div class="custom-input-group">
                 <label for="password" class="form-label small fw-semibold text-secondary mb-1">Password</label>
                 <div class="position-relative">
-                    <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password">
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="Enter password" autocomplete="current-password">
                     <span class="input-icon" id="togglePasswordBtn" style="cursor: pointer; pointer-events: auto;">
                         <i class="bi bi-eye text-muted" id="togglePasswordIcon"></i>
                     </span>

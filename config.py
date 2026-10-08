@@ -1,4 +1,4 @@
-﻿import os
+import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
@@ -10,9 +10,11 @@ class Config:
     # Database config: supports direct DATABASE_URL or component variables, with SQLite fallback
     database_url = os.getenv('DATABASE_URL')
     
-    # Normalize postgres:// to postgresql:// for SQLAlchemy compatibility (e.g. Supabase, Neon, Heroku)
+    # Normalize database URLs for SQLAlchemy compatibility
     if database_url and database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
+    elif database_url and database_url.startswith("mysql://"):
+        database_url = database_url.replace("mysql://", "mysql+pymysql://", 1)
         
     if not database_url:
         db_user = os.getenv('DB_USER')
@@ -34,13 +36,14 @@ class Config:
             )
             
             if is_serverless:
-                import shutil
-                tmp_db = '/tmp/attendx.db'
+                import shutil, tempfile
+                tmp_dir = '/tmp' if os.path.isdir('/tmp') else tempfile.gettempdir()
+                tmp_db = os.path.join(tmp_dir, 'attendx.db').replace('\\', '/')
                 if not os.path.exists(tmp_db) and os.path.exists(bundled_db):
                     try:
                         shutil.copyfile(bundled_db, tmp_db)
                     except Exception as e:
-                        print(f"Notice: Failed to copy bundled DB to /tmp: {e}")
+                        print(f"Notice: Failed to copy bundled DB to {tmp_db}: {e}")
                 database_url = f"sqlite:///{tmp_db}"
             else:
                 database_url = f"sqlite:///{bundled_db}"

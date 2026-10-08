@@ -7,12 +7,16 @@ from models import (
     Student, Period, Attendance, AttendanceCorrection, StudentMark
 )
 
-def seed_database():
-    app = create_app()
+def seed_database(app=None, drop_existing=True):
+    if app is None:
+        app = create_app()
     with app.app_context():
-        print("Dropping existing tables and creating fresh schema...")
-        db.drop_all()
-        db.create_all()
+        if drop_existing:
+            print("Dropping existing tables and creating fresh schema...")
+            db.drop_all()
+            db.create_all()
+        else:
+            db.create_all()
 
         print("Seeding Users...")
         # 1. Admin User
