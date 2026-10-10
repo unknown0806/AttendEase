@@ -27,7 +27,8 @@ def _rewrite_path(environ):
     else:
         path = environ.get("PATH_INFO", "/")
         if path.startswith("/api/"):
-            environ["PATH_INFO"] = "/"
+            environ["PATH_INFO"] = path[5:]
+            environ["SCRIPT_NAME"] = "/api"
 
 
 class _PathRewriteMiddleware:
